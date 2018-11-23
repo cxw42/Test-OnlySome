@@ -14,7 +14,7 @@ use Test::More;
 use Carp qw(carp croak);
 use constant { true => !!1, false => !!0 };
 
-our @EXPORT = qw(int2ascii alen tokencopy contains_string);
+our @EXPORT = qw(int2ascii alen tokencopy contains_string true false);
 
 sub contains_string($$;$) {   # Adapted from Test::LongString {{{1
     my ($str,$sub,$name) = @_;
