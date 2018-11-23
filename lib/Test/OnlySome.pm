@@ -13,11 +13,31 @@ use parent 'Exporter';
 our @EXPORT = qw( $TEST_NUMBER_OS skip_these skip_next );
 
 # Docs {{{3
+
 =head1 NAME
 
 Test::OnlySome - Skip individual tests in a *.t file
 
-=head1 SYNOPSIS
+=head1 INSTALLATION
+
+Easiest: install C<cpanminus> if you don't have it - see
+L<https://metacpan.org/pod/App::cpanminus#INSTALLATION>.  Then run
+C<cpanm Test::OnlySome>.
+
+Manually: clone or untar into a working directory.  Then, in that directory,
+
+    perl Makefile.PL
+    make
+    make test
+
+... and if all the tests pass,
+
+    make install
+
+If some of the tests fail, please check the issues and file a new one if
+no one else has reported the problem yet.
+
+=head1 USAGE
 
     use Test::More;
     use Test::OnlySome;
@@ -27,55 +47,13 @@ Test::OnlySome - Skip individual tests in a *.t file
     os $opts ok(1, 'This will run');    # Single statement OK
 
     os $opts {                          # Block also OK
-        ok(0, 'This will be skipped');
+        ok(0, 'This will be skipped');  # Skipped since it's test 2
     };
-
-=head1 INTERNALS
 
 =cut
 
 # }}}3
 
-# Implementation of keywords (macro) {{{1
-
-=head2 _gen
-
-This routine generates source code that, at runtime, will execute a given
-only-some test.
-
-=cut
-
-sub _gen {
-    my $optsVarName = shift or croak 'Need an options-var name';
-    my $code = shift or croak 'Need code';
-
-    # Syntactic parts, so I don't have to disambiguate interpolation in the
-    # qq{} below from hash access in the generated code.  Instead of
-    # $foo->{bar}, interpolations below use $foo$W$L bar $R.
-    my $W = '->';
-    my $L = '{';
-    my $R = '}';
-
-    my $replacement = qq{
-        do {
-            my \$ntests = $optsVarName$W$L n $R // 1;   # TODO move this to a separate parm of os()
-            my \$first_test_num = \$TEST_NUMBER_OS;
-            \$TEST_NUMBER_OS += \$ntests;
-            SKIP: {
-                # print STDERR " ==> Trying test \$first_test_num\\n"; # DEBUG
-                skip 'Test::OnlySome: you asked me to skip these', \$ntests
-                    if $optsVarName$W$L skip $R$W$L \$first_test_num $R;
-                $code
-            }
-        };
-    };
-
-    #print STDERR "$replacement\n"; # DEBUG
-    return $replacement;
-
-} #_gen()
-
-# }}}1
 # Caller-facing routines {{{1
 
 =head1 EXPORTS
@@ -178,6 +156,48 @@ not in the caller's scope.
     } # os() }}}2
 
 } # import()
+# }}}1
+# Implementation of keywords (macro) {{{1
+
+=head1 INTERNALS
+
+=head2 _gen
+
+This routine generates source code that, at runtime, will execute a given
+only-some test.
+
+=cut
+
+sub _gen {
+    my $optsVarName = shift or croak 'Need an options-var name';
+    my $code = shift or croak 'Need code';
+
+    # Syntactic parts, so I don't have to disambiguate interpolation in the
+    # qq{} below from hash access in the generated code.  Instead of
+    # $foo->{bar}, interpolations below use $foo$W$L bar $R.
+    my $W = '->';
+    my $L = '{';
+    my $R = '}';
+
+    my $replacement = qq{
+        do {
+            my \$ntests = $optsVarName$W$L n $R // 1;   # TODO move this to a separate parm of os()
+            my \$first_test_num = \$TEST_NUMBER_OS;
+            \$TEST_NUMBER_OS += \$ntests;
+            SKIP: {
+                # print STDERR " ==> Trying test \$first_test_num\\n"; # DEBUG
+                skip 'Test::OnlySome: you asked me to skip these', \$ntests
+                    if $optsVarName$W$L skip $R$W$L \$first_test_num $R;
+                $code
+            }
+        };
+    };
+
+    #print STDERR "$replacement\n"; # DEBUG
+    return $replacement;
+
+} #_gen()
+
 # }}}1
 
 # More docs {{{3
