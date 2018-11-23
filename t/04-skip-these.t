@@ -3,9 +3,8 @@ use rlib 'lib';
 use DTest;
 use Test::OnlySome;
 
-my $hrOpts = {
-    skip => { 2=>true, 4=>true }
-};
+my $hrOpts = {};
+skip_these $hrOpts, 2, 4, 6;
 
 is($TEST_NUMBER_OS, 1, 'Tests start at 1');
 
@@ -28,5 +27,15 @@ is($TEST_NUMBER_OS, 5, '$TEST_NUMBER_OS increments to 5');
 os $hrOpts ok(1, 'Test 5');     # This one should run
 
 is($TEST_NUMBER_OS, 6, '$TEST_NUMBER_OS increments to 6');
+
+$hrOpts->{n} = 2;
+os $hrOpts {
+    ok(0, 'Test 6');
+    ok(0, 'Test 7');
+};
+
+is($TEST_NUMBER_OS, 8, '$TEST_NUMBER_OS increments to 8');
+
+ok(1, 'Test 9');
 
 done_testing();

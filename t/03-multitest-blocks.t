@@ -1,6 +1,4 @@
 #!perl
-package t02;
-
 use rlib 'lib';
 use DTest;
 use Test::OnlySome;

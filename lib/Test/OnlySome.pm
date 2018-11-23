@@ -7,8 +7,10 @@ use Keyword::Declare;
 #use Data::Dumper;
 use Carp qw(croak);
 
+use constant { true => !!1, false => !!0 };
+
 use parent 'Exporter';
-our @EXPORT = qw( $TEST_NUMBER_OS );
+our @EXPORT = qw( $TEST_NUMBER_OS skip_these skip_next );
 
 # Docs {{{3
 =head1 NAME
@@ -17,9 +19,16 @@ Test::OnlySome - Skip individual tests in a *.t file
 
 =head1 SYNOPSIS
 
-TODO
-
+    use Test::More;
     use Test::OnlySome;
+
+    my $opts = { skip => { 2=>true } };
+
+    os $opts ok(1, 'This will run');    # Single statement OK
+
+    os $opts {                          # Block also OK
+        ok(0, 'This will be skipped');
+    };
 
 =head1 INTERNALS
 
@@ -67,13 +76,54 @@ sub _gen {
 } #_gen()
 
 # }}}1
-# Importer, and keyword definitions {{{1
+# Caller-facing routines {{{1
 
 =head1 EXPORTS
 
+=head2 skip_these
+
+A convenience function to fill in C<< $hashref_options->{skip} >>.
+
+    skip_these $hashref_options, 1, 2;
+        # Skip tests 1 and 2
+
+=cut
+
+sub skip_these {
+    my $hrOpts = shift;
+    croak 'Need an options hash reference' unless ref $hrOpts eq 'HASH';
+    $hrOpts->{skip}->{$_} = true foreach(@_);
+} #skip_these()
+
+=head2 skip_next
+
+Another convenience function: Mark the next test to be skipped.
+
+=cut
+
+sub skip_next {
+    my $hrOpts = shift;
+    croak 'Need an options hash reference' unless ref $hrOpts eq 'HASH';
+
+    my $target = caller or croak("Couldn't find caller");
+
+    my $next_test;
+    {
+        no strict 'refs';
+        $next_test = ${ "${target}::TEST_NUMBER_OS" } or
+            croak "Couldn't get \$TEST_NUMBER_OS from $target";
+    };
+
+    $hrOpts->{skip}->{$next_test} = true;
+} #skip_next()
+
+# }}}1
+# Importer, and keyword definitions {{{1
+
 =head2 import
 
-The C<import> sub defines the keywords so that they will be exported.
+The C<import> sub defines the keywords so that they will be exported (!).
+This is per L<Keyword::Declare>.
 
 =cut
 
@@ -92,7 +142,7 @@ sub import {
 
 =head2 os
 
-Keyword C<os> marks a statement that should be excuted B<o>nly B<o>ome of
+Keyword C<os> marks a statement that should be excuted B<o>nly B<s>ome of
 the time.  Example:
 
     os 'main::debug' $hrOpts  ok 1,'Something';
@@ -183,11 +233,11 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 # }}}3
 
-our $VERSION = '0.000_001';
+our $VERSION = '0.000_002';
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2-dev
 
 =cut
 
