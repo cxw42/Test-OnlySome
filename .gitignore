@@ -1,3 +1,24 @@
+# Specific
+/tags
+*.stackdump
+core
+
+# Dist
+Test-OnlySome-*
+Test-OnlySome-*.tar.gz
+
+# Editor
+*.bak
+*~
+~*
+*.swp
+*.tmp
+
+# From Module::Starter's ignore.txt:
+.lwpcookies
+pod2htm*.tmp
+
+# from GitHub's perl .gitignore:
 !Build/
 .last_cover_stats
 /META.yml
@@ -33,3 +54,9 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*.zip
+
+# Capture::Tiny
+DEBUG*
+
+# App::FatPacker
+*.trace
