@@ -4,13 +4,13 @@ use 5.012;
 use strict;
 use warnings;
 use Keyword::Declare;
-#use Data::Dumper;
+use Data::Dumper;
 use Carp qw(croak);
 
 use constant { true => !!1, false => !!0 };
 
 use parent 'Exporter';
-our @EXPORT = qw( $TEST_NUMBER_OS skip_these skip_next );
+our @EXPORT = qw( $TEST_NUMBER_OS $TEST_ONLYSOME skip_these skip_next );
 
 # Docs {{{3
 
@@ -114,6 +114,7 @@ sub import {
     do {
         no strict 'refs';
         ${ "$target" . '::TEST_NUMBER_OS' } = 1;    # tests start at 1, not 0
+        ${ "$target" . '::TEST_ONLYSOME' } = {};
     };
 
 # `os` keyword - mark each test-calling statement this way {{{2
@@ -139,20 +140,38 @@ not in the caller's scope.
 
 =cut
 
-    keyword os(String? $debug_var, Var $opts, Block|Statement $controlled) {
+    keyword os(String? $debug_var, Var? $opts_name, Block|Statement $controlled) {
+        my $target = caller(2);     # Skip past Keyword
+
+#        # Print full stack trace
+#        my @callers;
+#        for(my $i=0; 1; ++$i) {
+#            ##       0         1          2      3            4
+#            #my ($package, $filename, $line, $subroutine, $hasargs,
+#            ##    5          6          7            8       9         10
+#            #$wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
+#            #= caller($i);
+#            push @callers, [caller($i)];
+#            last unless $callers[-1]->[0];
+#        }
+#        print Dumper(\@callers, "\n");
+
         if(defined $debug_var) {
             no strict 'refs';
             $debug_var =~ s/^['"]|['"]$//g;   # $debug_var comes with quotes
-            ${$debug_var} = {opts_var_name => $opts, code => $controlled};
+            ${$debug_var} = {opts_var_name => $opts_name, code => $controlled};
             #print STDERR "# Stashed $controlled into `$debug_var`\n";
             #print STDERR Carp::ret_backtrace(); #join "\n", caller(0);
         }
 
-        croak "Need options as a scalar variable holding a hashref"
-            unless defined $opts && substr($opts, 0, 1) eq '$';
+        # Get the options
+        my $hrOptsName = $opts_name || ('$' . $target . '::TEST_ONLYSOME');
+
+        croak "Need options as a scalar variable holding a hashref - got $hrOptsName"
+            unless defined $hrOptsName && substr($hrOptsName, 0, 1) eq '$';
 
         # print STDERR "Options in $opts\n";
-        return _gen($opts, $controlled);
+        return _gen($hrOptsName, $controlled);
     } # os() }}}2
 
 } # import()

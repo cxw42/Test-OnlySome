@@ -79,4 +79,4 @@ WriteMakefile(
     clean => { FILES => 'Test-OnlySome-*' },
 );
 
-# vi: set fdm=marker: #
+# vi: set fdm=marker fdl=0: #
