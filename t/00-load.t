@@ -1,8 +1,6 @@
-#!perl -T
-use 5.006;
-use strict;
-use warnings;
-use Test::More;
+#!perl
+use rlib 'lib';
+use DTest;
 
 plan tests => 1;
 

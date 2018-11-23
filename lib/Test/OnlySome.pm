@@ -1,66 +1,74 @@
 package Test::OnlySome;
 
-use 5.006;
+use 5.012;
 use strict;
 use warnings;
+use Keyword::Declare;
+#use Carp;
 
+# Docs {{{1
 =head1 NAME
 
-Test::OnlySome - The great new Test::OnlySome!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
+Test::OnlySome - Skip individual tests in a *.t file
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+TODO
 
     use Test::OnlySome;
 
-    my $foo = Test::OnlySome->new();
-    ...
-
 =head1 EXPORT
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+=cut
 
-=head1 SUBROUTINES/METHODS
+# }}}1
 
-=head2 function1
+# Importer, and keyword definitions {{{1
+
+=head2 import
+
+The C<import> sub defines the keywords so that they will be exported.
 
 =cut
 
-sub function1 {
-}
+sub import {
 
-=head2 function2
+# `os` keyword - mark each test-calling statement this way {{{2
+
+=head2 os
+
+Keyword C<os> marks a statement that should be excuted C<O>nly C<S>ome of
+the time.
 
 =cut
 
-sub function2 {
-}
+    # TODO
+    # - Permit lexical state
+    # - Permit skipping more than one test in $controlled
 
+    keyword os(String? $debug_var, Block|Statement $controlled) {
+        if(defined $debug_var) {
+            no strict 'refs';
+            $debug_var =~ s/^['"]|['"]$//g;   # $debug_var comes with quotes
+            ${$debug_var} = $controlled;
+            #print STDERR "# Stashed $controlled into `$debug_var`\n";
+            #print STDERR Carp::ret_backtrace(); #join "\n", caller(0);
+        }
+        return $controlled;     # for now, no changes
+    } # os() }}}2
+
+} # import()
+# }}}1
+
+# More docs {{{1
 =head1 AUTHOR
 
 Christopher White, C<< <cxwembedded at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-test-onlysome at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-OnlySome>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report any bugs or feature requests on GitHub, at
+L<https://github.com/cxw42/Test-OnlySome/issues>.
 
 =head1 SUPPORT
 
@@ -73,9 +81,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * The GitHub repository
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
+L<https://github.com/cxw42/Test-OnlySome>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -89,11 +97,23 @@ L<https://cpanratings.perl.org/d/Test-OnlySome>
 
 L<https://metacpan.org/release/Test-OnlySome>
 
+=item * RT: CPAN's request tracker
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
+
 =back
 
+=cut
 
-=head1 ACKNOWLEDGEMENTS
+# }}}1
 
+our $VERSION = '0.000_001';
+
+=head1 VERSION
+
+Version 0.0.1
+
+# License {{{1
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -123,7 +143,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-
 =cut
 
-1; # End of Test::OnlySome
+# }}}1
+1;
+
+# vi: set fdm=marker: #
