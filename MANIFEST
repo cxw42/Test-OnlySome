@@ -11,6 +11,11 @@ t/02-single-tests.t
 t/03-multitest-blocks.t
 t/04-skip-these.t
 t/05-skip-next.t
+t/11-input-forms-implicit-config.t
+t/12-single-tests-implicit-config.t
+t/13-multitest-blocks-implicit-config.t
+t/14-skip-these-implicit-config.t
+t/15-skip-next-implicit-config.t
 t/lib/DTest.pm			Helpers for testing
 xt/boilerplate.t
 xt/manifest.t

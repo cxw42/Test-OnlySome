@@ -73,7 +73,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Data::Dumper' => '0',
-        'Keyword::Declare'  => '0',
+        'Keyword::Declare'  => '0.001006',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Test-OnlySome-*' },

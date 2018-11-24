@@ -40,4 +40,8 @@ is($TEST_NUMBER_OS, 8, '$TEST_NUMBER_OS increments to 8');
 
 ok(1, 'Test 9');
 
+is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true}, n=>2},
+    'Options structure is what we set');
+is_deeply($TEST_ONLYSOME, {}, '$TEST_ONLYSOME is empty');
+
 done_testing();

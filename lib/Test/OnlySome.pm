@@ -42,6 +42,9 @@ no one else has reported the problem yet.
     use Test::More;
     use Test::OnlySome;
 
+You can pick which tests to skip using implicit or explicit configuration.
+Explicit configuration uses a hashref:
+
     my $opts = { skip => { 2=>true } };
 
     os $opts ok(1, 'This will run');    # Single statement OK
@@ -49,6 +52,13 @@ no one else has reported the problem yet.
     os $opts {                          # Block also OK
         ok(0, 'This will be skipped');  # Skipped since it's test 2
     };
+
+Implicit configuration uses a hashref in the package variable C<$TEST_ONLYSOME>,
+which Test::OnlySome creates in your package when you C<use> it:
+
+    $TEST_ONLYSOME->{skip} = { 2=>true };
+    os ok(1, 'Test 1');                     # This one runs
+    os ok(0, 'Test 2 - should be skipped'); # Skipped since it's test 2
 
 =cut
 
@@ -64,11 +74,14 @@ A convenience function to fill in C<< $hashref_options->{skip} >>.
 
     skip_these $hashref_options, 1, 2;
         # Skip tests 1 and 2
+    skip_these 1, 2
+        # If you are using implicit configuration
 
 =cut
 
 sub skip_these {
-    my $hrOpts = shift;
+    my $hrOpts = _opts($_[0]);
+    shift if $_[0] && $hrOpts == $_[0];
     croak 'Need an options hash reference' unless ref $hrOpts eq 'HASH';
     $hrOpts->{skip}->{$_} = true foreach(@_);
 } #skip_these()
@@ -80,7 +93,8 @@ Another convenience function: Mark the next test to be skipped.
 =cut
 
 sub skip_next {
-    my $hrOpts = shift;
+    my $hrOpts = _opts($_[0]);
+    shift if $_[0] && $hrOpts == $_[0];
     croak 'Need an options hash reference' unless ref $hrOpts eq 'HASH';
 
     my $target = caller or croak("Couldn't find caller");
@@ -141,7 +155,8 @@ not in the caller's scope.
 =cut
 
     keyword os(String? $debug_var, Var? $opts_name, Block|Statement $controlled) {
-        my $target = caller(2);     # Skip past Keyword
+        my $target = caller(2);     # Skip past Keyword::Declare's code.
+                                    # TODO make this more robust.
 
 #        # Print full stack trace
 #        my @callers;
@@ -216,6 +231,22 @@ sub _gen {
     return $replacement;
 
 } #_gen()
+
+=head2 _opts
+
+Returns the appropriate options hashref.  Call as C<_opts $_[0]>.
+
+=cut
+
+sub _opts {
+    my $arg = shift;
+    return $arg if ref $arg eq 'HASH';
+
+    # Implicit config: find the caller's package and get $TEST_ONLYSOME
+    my $target = caller(1) or croak 'Could not find caller';
+    return do { no strict 'refs'; ${ "$target" . '::TEST_ONLYSOME' } };
+
+} #_opts()
 
 # }}}1
 

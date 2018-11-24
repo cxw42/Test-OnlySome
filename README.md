@@ -26,6 +26,9 @@ no one else has reported the problem yet.
     use Test::More;
     use Test::OnlySome;
 
+You can pick which tests to skip using implicit or explicit configuration.
+Explicit configuration uses a hashref:
+
     my $opts = { skip => { 2=>true } };
 
     os $opts ok(1, 'This will run');    # Single statement OK
@@ -33,6 +36,13 @@ no one else has reported the problem yet.
     os $opts {                          # Block also OK
         ok(0, 'This will be skipped');  # Skipped since it's test 2
     };
+
+Implicit configuration uses a hashref in the package variable `$TEST_ONLYSOME`,
+which Test::OnlySome creates in your package when you `use` it:
+
+    $TEST_ONLYSOME->{skip} = { 2=>true };
+    os ok(1, 'Test 1');                     # This one runs
+    os ok(0, 'Test 2 - should be skipped'); # Skipped since it's test 2
 
 # EXPORTS
 
@@ -42,6 +52,8 @@ A convenience function to fill in `$hashref_options->{skip}`.
 
     skip_these $hashref_options, 1, 2;
         # Skip tests 1 and 2
+    skip_these 1, 2
+        # If you are using implicit configuration
 
 ## skip\_next
 
@@ -77,6 +89,10 @@ not in the caller's scope.
 
 This routine generates source code that, at runtime, will execute a given
 only-some test.
+
+## \_opts
+
+Returns the appropriate options hashref.  Call as `_opts $_[0]`.
 
 # VARIABLES
 

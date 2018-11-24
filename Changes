@@ -1,5 +1,11 @@
 Revision history for Test-OnlySome
 
 0.0_1   2018-11-23
-        First version, released on an unsuspecting world.
 
+    - First version, released on an unsuspecting world.
+
+0.0_2   2018-11-24
+
+    - Require Keyword::Declare 0.001006+ based on cpantesters matrix results.
+    - Support implicit configuration using a package-level variable rather than
+      an expressly-passed hashref.
