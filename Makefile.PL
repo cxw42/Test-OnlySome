@@ -38,7 +38,7 @@ authortest:
 \tRELEASE_TESTING=1 prove -l xt
 
 testhere:   # Run the tests from lib rather than blib
-\tprove -lv
+\tprove -lj4
 
 README.md: lib/Test/OnlySome.pm
 \tpod2markdown \$< > \$@

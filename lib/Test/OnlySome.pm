@@ -134,18 +134,18 @@ sub import {
         return;     # *** EXIT POINT ***
     }
 
-    # Sanity check - e.g., `perl -MTest::OnlySome -E `os ok(1);` will die
-    # because skip() isn't defined.  However, we don't require Test::More
-    # because there might be other packages that you are using that provide
-    # skip().
+    # Sanity check - e.g., `perl -MTest::OnlySome -E `os ok(1);` will
+    # die because skip() isn't defined.  However, we don't require
+    # Test::More because there might be other packages that you are
+    # using that provide skip().
     {
         no strict 'refs';
-        croak "Test::OnlySome: skip() not defined - I can't function!  (Missing `use Test::More`?)"
-            unless (defined &{ $target . '::skip'}); # || $INC{'Test/More.pm'};
+        croak "Test::OnlySome: ${target}::skip() not defined - I can't function!  (Missing `use Test::More`?)"
+            unless (defined &{ $target . '::skip' });
     }
 
     # Copy symbols listed in @EXPORT first.  Ignore @_, which we are
-    # going to use for our own purposes.
+    # going to use for our own purposes below.
     $self->export_to_level($level);
 
     # Create the variables we need in the target package
@@ -206,7 +206,6 @@ not in the caller's scope.
         }
 
         # Get the options
-        #my $hrOptsName = $opts_name || ('$' . $target . '::TEST_ONLYSOME');
         my $hrOptsName = $opts_name || '$TEST_ONLYSOME';
 
 #        print STDERR "os: Options in $hrOptsName\n";
@@ -220,6 +219,8 @@ not in the caller's scope.
 
 } # import()
 
+# Unimport {{{2
+
 =head2 unimport
 
 Removes the L</os> keyword definition.
@@ -230,49 +231,11 @@ sub unimport {
     unkeyword os;
 }
 
+# }}}2
 # }}}1
 # Implementation of keywords (macro), and internal helpers {{{1
 
 =head1 INTERNALS
-
-=head2 _escapekit
-
-Find the caller using a Test::Kit package that uses us, so we can import
-the keyword the right place.
-
-=cut
-
-sub _escapekit {
-# Find the real target package, in case we were called from Test::Kit
-    my $kit = shift;
-    #print STDERR "Invoked from Test::Kit module $kit\n";
-
-    my $level;
-
-    #       0         1          2      3            4
-    my ($callpkg, $filename, $line, $subroutine, $hasargs,
-    #    5          6          7            8       9         10
-    $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash);
-
-    # Find the caller of $kit, and import directly there.
-    for($level=0; 1; ++$level) {
-        #       0         1          2      3            4
-        ($callpkg, $filename, $line, $subroutine, $hasargs,
-        #    5          6          7            8       9         10
-        $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
-        = caller($level);
-        last unless $callpkg;
-        last if $callpkg eq $kit;
-    } #for levels
-
-    if($callpkg && ($callpkg eq $kit)) {
-        ++$level;
-        $callpkg = caller($level);
-        return ($callpkg, $level) if $callpkg;
-    }
-
-    die "Could not find the module that invoked Test::Kit module $kit";
-} #_escapekit()
 
 =head2 _gen
 
@@ -311,6 +274,8 @@ sub _gen {
 
 } #_gen()
 
+# `os`, skip*() helpers {{{2
+
 =head2 _opts
 
 Returns the appropriate options hashref.  Call as C<_opts($_[0])>.
@@ -343,6 +308,41 @@ sub _nexttestnum {
     return do { no strict 'refs'; ${ "$target" . '::TEST_NUMBER_OS' } };
 } #_nexttestnum()
 
+# }}}2
+# `use` helpers {{{2
+
+=head2 _escapekit
+
+Find the caller using a Test::Kit package that uses us, so we can import
+the keyword the right place.
+
+=cut
+
+sub _escapekit {
+# Find the real target package, in case we were called from Test::Kit
+    my $kit = shift;
+    #print STDERR "Invoked from Test::Kit module $kit\n";
+
+    my $level;
+
+    my $callpkg;
+
+    # Find the caller of $kit, and import directly there.
+    for($level=0; 1; ++$level) {
+        $callpkg = caller($level);
+        last unless $callpkg;
+        last if $callpkg eq $kit;
+    } #for levels
+
+    if($callpkg && ($callpkg eq $kit)) {
+        ++$level;
+        $callpkg = caller($level);
+        return ($callpkg, $level) if $callpkg;
+    }
+
+    die "Could not find the module that invoked Test::Kit module $kit";
+} #_escapekit()
+
 =head2 _printtrace
 
 Print a full stack trace
@@ -364,6 +364,7 @@ sub _printtrace {
     print Dumper(\@callers), "\n";
 }
 
+# }}}2
 # }}}1
 
 # More docs, and $VERSION {{{3

@@ -92,11 +92,6 @@ Removes the ["os"](#os) keyword definition.
 
 # INTERNALS
 
-## \_escapekit
-
-Find the caller using a Test::Kit package that uses us, so we can import
-the keyword the right place.
-
 ## \_gen
 
 This routine generates source code that, at runtime, will execute a given
@@ -109,6 +104,11 @@ Returns the appropriate options hashref.  Call as `_opts($_[0])`.
 ## \_nexttestnum
 
 Gets the caller's current `$TEST_NUMBER_OS` value.
+
+## \_escapekit
+
+Find the caller using a Test::Kit package that uses us, so we can import
+the keyword the right place.
 
 ## \_printtrace
 
