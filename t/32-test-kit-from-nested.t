@@ -1,7 +1,7 @@
 #!perl
 # 31-import-into-from-nested.t: A selection of tests 01-19, but using a packaged
 # Import::Into to grab Test::OnlySome
-package t31;
+package t32;
 
 use rlib 'lib';
 use DTest;
@@ -14,11 +14,11 @@ our ($t1, $t2);
 
 my $hrOpts = {};
 
-os 't31::t1' $hrOpts my $a1;
-is($t31::t1->{code}, 'my $a1;', 'os() grabs a statement');
+os 't32::t1' $hrOpts my $a1;
+is($t1->{code}, 'my $a1;', 'os() grabs a statement');
 
-os 't31::t2' $hrOpts {my $a2; my $b2;};
-is($t31::t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
+os 't32::t2' $hrOpts {my $a2; my $b2;};
+is($t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
 
 BEGIN {
     eval { local $SIG{'__DIE__'}; os $hrOpts my $a3; };

@@ -1,7 +1,7 @@
 #!perl
 # 22-import-into-implicit.t: A selection of tests 01-19, but using a packaged
 # Import::Into to grab Test::OnlySome, and using implicit config
-package main;
+package t22;
 
 use rlib 'lib';
 use DTest;
@@ -12,11 +12,11 @@ use DImportInto;
 # at compile time, and the stack trace doesn't point us here.
 our ($t1, $t2);
 
-os 'main::t1' my $a1;
-is($main::t1->{code}, 'my $a1;', 'os() grabs a statement');
+os 't22::t1' my $a1;
+is($t1->{code}, 'my $a1;', 'os() grabs a statement');
 
-os 'main::t2' {my $a2; my $b2;};
-is($main::t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
+os 't22::t2' {my $a2; my $b2;};
+is($t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
 
 BEGIN {
     eval { local $SIG{'__DIE__'}; os my $a3; };

@@ -15,10 +15,10 @@ our ($t1, $t2);
 my $hrOpts = {};
 
 os 't21::t1' $hrOpts my $a1;
-is($t21::t1->{code}, 'my $a1;', 'os() grabs a statement');
+is($t1->{code}, 'my $a1;', 'os() grabs a statement');
 
 os 't21::t2' $hrOpts {my $a2; my $b2;};
-is($t21::t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
+is($t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
 
 BEGIN {
     eval { local $SIG{'__DIE__'}; os $hrOpts my $a3; };

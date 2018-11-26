@@ -1,5 +1,5 @@
 #!perl
-package t01;
+package t11;
 
 use rlib 'lib';
 use DTest;
@@ -7,13 +7,13 @@ use Test::OnlySome;
 
 # Vars to hold the debug output from os(), since os() processing happens
 # at compile time, and the stack trace doesn't point us here.
-our ($t1, $t2, $t3, $t4, $t5, $t6);
+our ($t1, $t2);
 
-os 't01::t1' my $a1;
-is($t01::t1->{code}, 'my $a1;', 'os() grabs a statement');
+os 't11::t1' my $a1;
+is($t1->{code}, 'my $a1;', 'os() grabs a statement');
 
-os 't01::t2' {my $a2; my $b2;};
-is($t01::t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
+os 't11::t2' {my $a2; my $b2;};
+is($t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
 
 BEGIN {
     eval { local $SIG{'__DIE__'}; os my $a3; };

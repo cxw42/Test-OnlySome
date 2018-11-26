@@ -339,7 +339,7 @@ sub _printtrace {
 
 # }}}1
 
-# More docs {{{3
+# More docs, and $VERSION {{{3
 =head1 VARIABLES
 
 =head2 C<$TEST_NUMBER_OS>
@@ -411,11 +411,11 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 # }}}3
 
-our $VERSION = '0.000_003';
+our $VERSION = '0.000_004';
 
 =head1 VERSION
 
-Version 0.0.3-dev
+Version 0.0.4 (dev)
 
 =cut
 

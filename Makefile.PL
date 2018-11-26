@@ -60,6 +60,7 @@ WriteMakefile(
     PL_FILES         => {},
     MIN_PERL_VERSION => '5.012',    # required by Keyword::Declare
     CONFIGURE_REQUIRES => {
+        'Config' => '0',
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
@@ -72,11 +73,13 @@ WriteMakefile(
         'Test::More' => '0',
     },
     TEST_REQUIRES => {
-        'Test::Kit' => '0',
+        'constant' => '0',
+        'Test::Kit' => '2.14',
     },
     PREREQ_PM => {
         'Data::Dumper' => '0',
         'Keyword::Declare'  => '0.001006',
+        'vars' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Test-OnlySome-*' },

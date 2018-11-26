@@ -7,15 +7,15 @@ use Test::OnlySome;
 
 # Vars to hold the debug output from os(), since os() processing happens
 # at compile time, and the stack trace doesn't point us here.
-our ($t1, $t2, $t3, $t4, $t5, $t6);
+our ($t1, $t2);
 
 my $hr = {foo => 'bar'};
 
 os 't01::t1' $hr my $a1;
-is($t01::t1->{code}, 'my $a1;', 'os() grabs a statement');
+is($t1->{code}, 'my $a1;', 'os() grabs a statement');
 
 os 't01::t2' $hr {my $a2; my $b2;};
-is($t01::t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
+is($t2->{code}, '{my $a2; my $b2;}', 'os() grabs a block');
 
 BEGIN {
     eval { local $SIG{'__DIE__'}; os $hr my $a3; };
