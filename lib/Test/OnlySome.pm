@@ -5,6 +5,7 @@ use warnings;
 use Keyword::Declare;
 use Data::Dumper;   # DEBUG
 use Carp qw(croak);
+use Scalar::Util qw(looks_like_number);
 
 use vars;
 use Import::Into;
@@ -133,17 +134,39 @@ sub import {
         return;     # *** EXIT POINT ***
     }
 
-    # Copy symbols listed in @EXPORT first, in case @_ gets trashed later.
-    $self->export_to_level($level, @_);
+    # Sanity check - e.g., `perl -MTest::OnlySome -E `os ok(1);` will die
+    # because skip() isn't defined.  However, we don't require Test::More
+    # because there might be other packages that you are using that provide
+    # skip().
+    {
+        no strict 'refs';
+        croak "Test::OnlySome: skip() not defined - I can't function!  (Missing `use Test::More`?)"
+            unless (defined &{ $target . '::skip'}); # || $INC{'Test/More.pm'};
+    }
+
+    # Copy symbols listed in @EXPORT first.  Ignore @_, which we are
+    # going to use for our own purposes.
+    $self->export_to_level($level);
 
     # Create the variables we need in the target package
     vars->import::into($target, qw($TEST_NUMBER_OS $TEST_ONLYSOME));
 
-    do {
+    # Initialize the variables unless they already have been
+    my $hrTOS;
+    {
         no strict 'refs';
-        ${ $target . '::TEST_NUMBER_OS' } = 1;    # tests start at 1, not 0
-        ${ $target . '::TEST_ONLYSOME' } = {};
+        ${ $target . '::TEST_NUMBER_OS' } = 1       # tests start at 1, not 0
+            unless ${ $target . '::TEST_NUMBER_OS' };
+        ${ $target . '::TEST_ONLYSOME' } = {}
+            unless 'HASH' eq ref ${ $target . '::TEST_ONLYSOME' };
+        $hrTOS = ${ $target . '::TEST_ONLYSOME' };
     };
+
+    # Check the arguments.  Numeric arguments are tests to skip.
+    foreach(@_) {
+        $hrTOS->{skip}->{$_} = true
+            if(!ref && looks_like_number $_);
+    }
 
 # `os` keyword - mark each test-calling statement this way {{{2
 
@@ -270,7 +293,7 @@ sub _gen {
     my $R = '}';
 
     my $replacement = qq{
-        do {
+        {
             my \$ntests = $optsVarName$W$L n $R // 1;   # TODO move this to a separate parm of os()
             my \$first_test_num = \$TEST_NUMBER_OS;
             \$TEST_NUMBER_OS += \$ntests;

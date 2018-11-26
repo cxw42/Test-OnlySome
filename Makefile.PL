@@ -79,6 +79,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Data::Dumper' => '0',
         'Keyword::Declare'  => '0.001006',
+        'Scalar::Util' => '1.39',
         'vars' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
