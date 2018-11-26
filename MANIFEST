@@ -1,4 +1,7 @@
 Changes
+foo.toml
+foo.txt
+foo.yml
 lib/Test/OnlySome.pm
 LICENSE
 Makefile.PL
@@ -11,12 +14,23 @@ t/02-single-tests.t
 t/03-multitest-blocks.t
 t/04-skip-these.t
 t/05-skip-next.t
+t/06-multi-package.t
 t/11-input-forms-implicit-config.t
 t/12-single-tests-implicit-config.t
 t/13-multitest-blocks-implicit-config.t
 t/14-skip-these-implicit-config.t
 t/15-skip-next-implicit-config.t
+t/21-import-into.t
+t/22-import-into-implicit.t
+t/23-test-kit.t
+t/24-test-kit-implicit.t
+t/31-import-into-from-nested.t
+t/32-test-kit-from-nested.t
+t/lib/DImportInto.pm
 t/lib/DTest.pm			Helpers for testing
+t/lib/DTestKit.pm
+t/lib/Nested/DImportInto.pm
+t/lib/Nested/DTestKit.pm
 xt/boilerplate.t
 xt/manifest.t
 xt/pod-coverage.t

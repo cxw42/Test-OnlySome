@@ -52,12 +52,15 @@ A convenience function to fill in `$hashref_options->{skip}`.
 
     skip_these $hashref_options, 1, 2;
         # Skip tests 1 and 2
-    skip_these 1, 2
+    skip_these 1, 2;
         # If you are using implicit configuration
 
 ## skip\_next
 
-Another convenience function: Mark the next test to be skipped.
+Another convenience function: Mark the next test to be skipped.  Example:
+
+    skip_next;
+    os ok(0, 'This one will be skipped');
 
 ## import
 
@@ -83,7 +86,16 @@ Syntax:
 CAUTION: The given statement or block will be run in its own lexical scope,
 not in the caller's scope.
 
+## unimport
+
+Removes the ["os"](#os) keyword definition.
+
 # INTERNALS
+
+## \_escapekit
+
+Find the caller using a Test::Kit package that uses us, so we can import
+the keyword the right place.
 
 ## \_gen
 
@@ -92,7 +104,15 @@ only-some test.
 
 ## \_opts
 
-Returns the appropriate options hashref.  Call as `_opts $_[0]`.
+Returns the appropriate options hashref.  Call as `_opts($_[0])`.
+
+## \_nexttestnum
+
+Gets the caller's current `$TEST_NUMBER_OS` value.
+
+## \_printtrace
+
+Print a full stack trace
 
 # VARIABLES
 
@@ -100,6 +120,21 @@ Returns the appropriate options hashref.  Call as `_opts $_[0]`.
 
 Exported into the caller's package.  A sequential numbering of tests that
 have been run under ["os"](#os).
+
+## `$TEST_ONLYSOME` (Options hashref)
+
+Exported into the caller's package.  A hashref of options, of the same format
+as an explicit-config hashref.  Keys are:
+
+- `n`
+
+    The number of tests in each ["os"](#os) call.
+
+- `skip`
+
+    A hashref of tests to skip.  Test numbers are keys; any truthy
+    value will indicate that the ["os"](#os) call beginning with that test number
+    should be skipped.
 
 # AUTHOR
 
@@ -140,7 +175,7 @@ You can also look for information at:
 
 # VERSION
 
-Version 0.0.2-dev
+Version 0.0.3-dev
 
 # LICENSE AND COPYRIGHT
 

@@ -1,11 +1,11 @@
 #!perl
-# 22-import-into-implicit.t: A selection of tests 01-19, but using a packaged
-# Import::Into to grab Test::OnlySome, and using implicit config
-package main;
+# 24-test-kit-implicit.t: A selection of tests 01-19, but using a packaged
+# Test::Kit to grab Test::OnlySome, and using implicit config
 
 use rlib 'lib';
 use DTest;
-use DImportInto;
+use DTestKit;
+use Data::Dumper;
 
 # 01 {{{1
 # Vars to hold the debug output from os(), since os() processing happens

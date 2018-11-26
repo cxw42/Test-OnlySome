@@ -9,3 +9,7 @@ Revision history for Test-OnlySome
     - Require Keyword::Declare 0.001006+ based on cpantesters matrix results.
     - Support implicit configuration using a package-level variable rather than
       an expressly-passed hashref.
+
+0.0_3   2018-11-25
+
+    - Can be used via Import::Into and Test::Kit

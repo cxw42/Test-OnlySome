@@ -1,16 +1,20 @@
 package Test::OnlySome;
-
 use 5.012;
 use strict;
 use warnings;
 use Keyword::Declare;
-use Data::Dumper;
+use Data::Dumper;   # DEBUG
 use Carp qw(croak);
+
+use vars;
+use Import::Into;
 
 use constant { true => !!1, false => !!0 };
 
 use parent 'Exporter';
-our @EXPORT = qw( $TEST_NUMBER_OS $TEST_ONLYSOME skip_these skip_next );
+our @EXPORT = qw( skip_these skip_next );
+
+# TODO move $TEST_NUMBER_OS into the options structure.
 
 # Docs {{{3
 
@@ -74,7 +78,7 @@ A convenience function to fill in C<< $hashref_options->{skip} >>.
 
     skip_these $hashref_options, 1, 2;
         # Skip tests 1 and 2
-    skip_these 1, 2
+    skip_these 1, 2;
         # If you are using implicit configuration
 
 =cut
@@ -88,7 +92,10 @@ sub skip_these {
 
 =head2 skip_next
 
-Another convenience function: Mark the next test to be skipped.
+Another convenience function: Mark the next test to be skipped.  Example:
+
+    skip_next;
+    os ok(0, 'This one will be skipped');
 
 =cut
 
@@ -96,17 +103,7 @@ sub skip_next {
     my $hrOpts = _opts($_[0]);
     shift if $_[0] && $hrOpts == $_[0];
     croak 'Need an options hash reference' unless ref $hrOpts eq 'HASH';
-
-    my $target = caller or croak("Couldn't find caller");
-
-    my $next_test;
-    {
-        no strict 'refs';
-        $next_test = ${ "${target}::TEST_NUMBER_OS" } or
-            croak "Couldn't get \$TEST_NUMBER_OS from $target";
-    };
-
-    $hrOpts->{skip}->{$next_test} = true;
+    $hrOpts->{skip}->{_nexttestnum()} = true;
 } #skip_next()
 
 # }}}1
@@ -120,15 +117,28 @@ This is per L<Keyword::Declare>.
 =cut
 
 sub import {
+    my $self = shift;
     my $target = caller;
+    my $level = 1;
+
+    #print STDERR "$self import into $target\n";
+    #_printtrace();
+
+    # Get out of Test::Kit if we're in there, since Test::Kit doesn't know how
+    # to copy the keyword from its fake package to the ultimate caller.
+    ($target, $level) = _escapekit($1) if $target =~ m{^Test::Kit::Fake::(.*)::\Q$self\E$};
+    #print STDERR "$self real target = $target at level $level\n";
 
     # Copy symbols listed in @EXPORT first, in case @_ gets trashed later.
-    Test::OnlySome->export_to_level(1, @_);
+    $self->export_to_level($level, @_);
+
+    # Create the variables we need in the target package
+    vars->import::into($target, qw($TEST_NUMBER_OS $TEST_ONLYSOME));
 
     do {
         no strict 'refs';
-        ${ "$target" . '::TEST_NUMBER_OS' } = 1;    # tests start at 1, not 0
-        ${ "$target" . '::TEST_ONLYSOME' } = {};
+        ${ $target . '::TEST_NUMBER_OS' } = 1;    # tests start at 1, not 0
+        ${ $target . '::TEST_ONLYSOME' } = {};
     };
 
 # `os` keyword - mark each test-calling statement this way {{{2
@@ -155,21 +165,10 @@ not in the caller's scope.
 =cut
 
     keyword os(String? $debug_var, Var? $opts_name, Block|Statement $controlled) {
-        my $target = caller(2);     # Skip past Keyword::Declare's code.
-                                    # TODO make this more robust.
 
-#        # Print full stack trace
-#        my @callers;
-#        for(my $i=0; 1; ++$i) {
-#            ##       0         1          2      3            4
-#            #my ($package, $filename, $line, $subroutine, $hasargs,
-#            ##    5          6          7            8       9         10
-#            #$wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
-#            #= caller($i);
-#            push @callers, [caller($i)];
-#            last unless $callers[-1]->[0];
-#        }
-#        print Dumper(\@callers, "\n");
+        # At this point, caller() is in Keyword::Declare.
+        #my $target = caller(2);     # Skip past Keyword::Declare's code.
+        #                            # TODO make this more robust.
 
         if(defined $debug_var) {
             no strict 'refs';
@@ -180,20 +179,73 @@ not in the caller's scope.
         }
 
         # Get the options
-        my $hrOptsName = $opts_name || ('$' . $target . '::TEST_ONLYSOME');
+        #my $hrOptsName = $opts_name || ('$' . $target . '::TEST_ONLYSOME');
+        my $hrOptsName = $opts_name || '$TEST_ONLYSOME';
 
-        croak "Need options as a scalar variable holding a hashref - got $hrOptsName"
+#        print STDERR "os: Options in $hrOptsName\n";
+#        _printtrace();
+
+        croak "Need options as a scalar variable - got $hrOptsName"
             unless defined $hrOptsName && substr($hrOptsName, 0, 1) eq '$';
 
-        # print STDERR "Options in $opts\n";
         return _gen($hrOptsName, $controlled);
     } # os() }}}2
 
 } # import()
+
+=head2 unimport
+
+Removes the L</os> keyword definition.
+
+=cut
+
+sub unimport {
+    unkeyword os;
+}
+
 # }}}1
-# Implementation of keywords (macro) {{{1
+# Implementation of keywords (macro), and internal helpers {{{1
 
 =head1 INTERNALS
+
+=head2 _escapekit
+
+Find the caller using a Test::Kit package that uses us, so we can import
+the keyword the right place.
+
+=cut
+
+sub _escapekit {
+# Find the real target package, in case we were called from Test::Kit
+    my $kit = shift;
+    #print STDERR "Invoked from Test::Kit module $kit\n";
+
+    my $level;
+
+    #       0         1          2      3            4
+    my ($callpkg, $filename, $line, $subroutine, $hasargs,
+    #    5          6          7            8       9         10
+    $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash);
+
+    # Find the caller of $kit, and import directly there.
+    for($level=0; 1; ++$level) {
+        #       0         1          2      3            4
+        ($callpkg, $filename, $line, $subroutine, $hasargs,
+        #    5          6          7            8       9         10
+        $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
+        = caller($level);
+        last unless $callpkg;
+        last if $callpkg eq $kit;
+    } #for levels
+
+    if($callpkg && ($callpkg eq $kit)) {
+        ++$level;
+        $callpkg = caller($level);
+        return ($callpkg, $level) if $callpkg;
+    }
+
+    die "Could not find the module that invoked Test::Kit module $kit";
+} #_escapekit()
 
 =head2 _gen
 
@@ -234,19 +286,56 @@ sub _gen {
 
 =head2 _opts
 
-Returns the appropriate options hashref.  Call as C<_opts $_[0]>.
+Returns the appropriate options hashref.  Call as C<_opts($_[0])>.
 
 =cut
 
 sub _opts {
+    my $target = caller(1) or croak 'Could not find caller';
     my $arg = shift;
+
+#    print STDERR "_opts: Options in ", (ref $arg eq 'HASH' ?
+#        'provided hashref' : "\$${target}::TEST_ONLYSOME\n");
+#    _printtrace();
+
     return $arg if ref $arg eq 'HASH';
 
     # Implicit config: find the caller's package and get $TEST_ONLYSOME
-    my $target = caller(1) or croak 'Could not find caller';
     return do { no strict 'refs'; ${ "$target" . '::TEST_ONLYSOME' } };
 
 } #_opts()
+
+=head2 _nexttestnum
+
+Gets the caller's current C<$TEST_NUMBER_OS> value.
+
+=cut
+
+sub _nexttestnum {
+    my $target = caller(1) or croak 'Could not find caller';
+    return do { no strict 'refs'; ${ "$target" . '::TEST_NUMBER_OS' } };
+} #_nexttestnum()
+
+=head2 _printtrace
+
+Print a full stack trace
+
+=cut
+
+sub _printtrace {
+    # Print full stack trace
+    my @callers;
+    for(my $i=0; 1; ++$i) {
+        ##       0         1          2      3            4
+        #my ($package, $filename, $line, $subroutine, $hasargs,
+        ##    5          6          7            8       9         10
+        #$wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
+        #= caller($i);
+        push @callers, [caller($i)];
+        last unless $callers[-1]->[0];
+    }
+    print Dumper(\@callers), "\n";
+}
 
 # }}}1
 
@@ -257,6 +346,25 @@ sub _opts {
 
 Exported into the caller's package.  A sequential numbering of tests that
 have been run under L</os>.
+
+=head2 C<$TEST_ONLYSOME> (Options hashref)
+
+Exported into the caller's package.  A hashref of options, of the same format
+as an explicit-config hashref.  Keys are:
+
+=over
+
+=item * C<n>
+
+The number of tests in each L</os> call.
+
+=item * C<skip>
+
+A hashref of tests to skip.  Test numbers are keys; any truthy
+value will indicate that the L</os> call beginning with that test number
+should be skipped.
+
+=back
 
 =head1 AUTHOR
 
@@ -303,11 +411,11 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 # }}}3
 
-our $VERSION = '0.000_002';
+our $VERSION = '0.000_003';
 
 =head1 VERSION
 
-Version 0.0.2-dev
+Version 0.0.3-dev
 
 =cut
 

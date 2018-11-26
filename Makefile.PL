@@ -71,6 +71,9 @@ WriteMakefile(
         'rlib' => '0',
         'Test::More' => '0',
     },
+    TEST_REQUIRES => {
+        'Test::Kit' => '0',
+    },
     PREREQ_PM => {
         'Data::Dumper' => '0',
         'Keyword::Declare'  => '0.001006',
