@@ -82,6 +82,17 @@ WriteMakefile(
         'Scalar::Util' => '1.39',
         'vars' => '0',
     },
+
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/cxw42/Test-OnlySome.git',
+                web  => 'https://github.com/cxw42/Test-OnlySome',
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Test-OnlySome-*' },
 );
