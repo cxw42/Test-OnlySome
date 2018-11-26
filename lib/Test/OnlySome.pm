@@ -124,10 +124,14 @@ sub import {
     #print STDERR "$self import into $target\n";
     #_printtrace();
 
-    # Get out of Test::Kit if we're in there, since Test::Kit doesn't know how
-    # to copy the keyword from its fake package to the ultimate caller.
-    ($target, $level) = _escapekit($1) if $target =~ m{^Test::Kit::Fake::(.*)::\Q$self\E$};
-    #print STDERR "$self real target = $target at level $level\n";
+    # Special-case imports from Test::Kit, since Test::Kit doesn't know how
+    # to copy the custom keyword from its fake package to the ultimate caller.
+    if($target =~ m{^Test::Kit::Fake::(.*)::\Q$self\E$}) {
+        ($target, $level) = _escapekit($1);
+        #print STDERR "$self real target = $target at level $level\n";
+        $self->import::into($target);   # Import into the real target
+        return;     # *** EXIT POINT ***
+    }
 
     # Copy symbols listed in @EXPORT first, in case @_ gets trashed later.
     $self->export_to_level($level, @_);
