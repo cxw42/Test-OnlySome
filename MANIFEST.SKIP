@@ -4,6 +4,8 @@
 ^~
 \bfoo\b.*
 
+^aggregate.pl$
+
 #!start included /home/ChrisW/perl5/perlbrew/perls/perlcygbrew-5.26.2-1/lib/5.26.2/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
