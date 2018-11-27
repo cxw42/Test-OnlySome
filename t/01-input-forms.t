@@ -29,6 +29,8 @@ BEGIN {
 
 # TODO figure out how to run these.  Currently, they abort the test despite
 # the eval{}.
+# See t/17*.t for thoughts that might help.  Maybe defer the croak() to the
+# generated code?  Or File::Package?
 
 #BEGIN {
 #    eval { local $SIG{'__DIE__'}; os @hr my $a5; };

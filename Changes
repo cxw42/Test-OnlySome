@@ -13,3 +13,13 @@ Revision history for Test-OnlySome
 0.0_3   2018-11-25
 
     - Can be used via Import::Into and Test::Kit
+
+0.0_4   2018-11-26
+
+    - Support package args to specify which tests to skip
+
+0.0_5   2018-??
+
+    - Package args now use a "skip" keyword ahead of the test numbers
+      to skip.
+    - Test numbers must be >= 1.

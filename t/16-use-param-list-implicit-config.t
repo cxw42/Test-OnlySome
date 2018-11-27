@@ -1,7 +1,7 @@
 #!perl
 use rlib 'lib';
 use DTest;
-use Test::OnlySome qw(2 6);
+use Test::OnlySome qw(skip 2 6);
 
 is($TEST_NUMBER_OS, 1, 'Tests start at 1');
 

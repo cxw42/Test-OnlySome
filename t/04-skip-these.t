@@ -2,6 +2,7 @@
 use rlib 'lib';
 use DTest;
 use Test::OnlySome;
+use Test::Fatal qw(dies_ok lives_ok);
 
 my $hrOpts = {};
 skip_these $hrOpts, 2, 4, 6;
@@ -41,5 +42,32 @@ ok(1, 'Test 9');
 is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true}, n=>2},
     'Options structure is what we set');
 is_deeply($TEST_ONLYSOME, {}, '$TEST_ONLYSOME is empty');
+
+dies_ok {
+    skip_these $hrOpts, 'not-a-number!';
+} 'skip_these throws on non-numeric inputs';
+
+dies_ok {
+    skip_these $hrOpts, 0
+} 'skip_these throws on 0';
+
+dies_ok {
+    skip_these $hrOpts, -1;
+} 'skip_these throws on -1';
+
+dies_ok {
+    skip_these $hrOpts, '0'
+} 'skip_these throws on "0"';
+
+dies_ok {
+    skip_these $hrOpts, '-1';
+} 'skip_these throws on "-1"';
+
+lives_ok {
+    skip_these $hrOpts, '1';
+} 'skip_these accepts "1"';
+
+is_deeply($hrOpts, {skip => {1=>true, 2=>true, 4=>true, 6=>true}, n=>2},
+    'Options structure is what we set, after modifications');
 
 done_testing();

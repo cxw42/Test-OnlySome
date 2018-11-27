@@ -81,6 +81,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'constant' => '0',
+        'Test::Fatal' => '0',
         'Test::Kit' => '2.14',
     },
     PREREQ_PM => {

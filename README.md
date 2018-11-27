@@ -97,9 +97,14 @@ Removes the ["os"](#os) keyword definition.
 This routine generates source code that, at runtime, will execute a given
 only-some test.
 
+## \_is\_testnum
+
+Return True if the provided parameter, or `$_`, is a valid test number.
+
 ## \_opts
 
-Returns the appropriate options hashref.  Call as `_opts($_[0])`.
+Returns the appropriate options hashref, and an indication of whether
+the caller should `shift` (true for explicit config).  Call as `_opts($_[0])`.
 
 ## \_nexttestnum
 
@@ -175,7 +180,7 @@ You can also look for information at:
 
 # VERSION
 
-Version 0.0.4 (dev)
+Version 0.0.5 (dev)
 
 # LICENSE AND COPYRIGHT
 

@@ -68,7 +68,14 @@ which Test::OnlySome creates in your package when you C<use> it:
 =cut
 
 # }}}3
-
+# Forward declarations of internal subs {{{3
+sub _gen;
+sub _is_testnum;
+sub _opts;
+sub _nexttestnum;
+sub _escapekit;
+sub _printtrace;
+# }}}3
 # Caller-facing routines {{{1
 
 =head1 EXPORTS
@@ -85,10 +92,16 @@ A convenience function to fill in C<< $hashref_options->{skip} >>.
 =cut
 
 sub skip_these {
-    my $hrOpts = _opts($_[0]);
-    shift if $_[0] && $hrOpts == $_[0];
+    my ($hrOpts, $should_shift) = _opts($_[0]);
+    shift if $should_shift;
     croak 'Need an options hash reference' unless ref $hrOpts eq 'HASH';
-    $hrOpts->{skip}->{$_} = true foreach(@_);
+    foreach(@_) {
+        if(_is_testnum) {
+            $hrOpts->{skip}->{$_} = true;
+        } else {
+            croak "'$_' is not a valid test number";
+        }
+    }
 } #skip_these()
 
 =head2 skip_next
@@ -101,8 +114,8 @@ Another convenience function: Mark the next test to be skipped.  Example:
 =cut
 
 sub skip_next {
-    my $hrOpts = _opts($_[0]);
-    shift if $_[0] && $hrOpts == $_[0];
+    my ($hrOpts, $should_shift) = _opts($_[0]);
+    shift if $should_shift;
     croak 'Need an options hash reference' unless ref $hrOpts eq 'HASH';
     $hrOpts->{skip}->{_nexttestnum()} = true;
 } #skip_next()
@@ -163,9 +176,17 @@ sub import {
     };
 
     # Check the arguments.  Numeric arguments are tests to skip.
+    my $curr_keyword = '';
     foreach(@_) {
-        $hrTOS->{skip}->{$_} = true
-            if(!ref && looks_like_number $_);
+        if(/^skip/) { $curr_keyword='skip'; next; }
+
+        if ( $curr_keyword eq 'skip' && _is_testnum ) {
+            $hrTOS->{skip}->{$_} = true;
+            next;
+        }
+
+        croak "Test::OnlySome: I can't understand argument '$_'" .
+            ($curr_keyword ? " to keyword '$curr_keyword'" : '');
     }
 
 # `os` keyword - mark each test-calling statement this way {{{2
@@ -274,11 +295,23 @@ sub _gen {
 
 } #_gen()
 
+=head2 _is_testnum
+
+Return True if the provided parameter, or C<$_>, is a valid test number.
+
+=cut
+
+sub _is_testnum {
+    my $arg = shift // $_;
+    return ($arg && !ref($arg) && looks_like_number($arg) && $arg >= 1);
+} #_is_testnum()
+
 # `os`, skip*() helpers {{{2
 
 =head2 _opts
 
-Returns the appropriate options hashref.  Call as C<_opts($_[0])>.
+Returns the appropriate options hashref, and an indication of whether
+the caller should C<shift> (true for explicit config).  Call as C<_opts($_[0])>.
 
 =cut
 
@@ -290,10 +323,10 @@ sub _opts {
 #        'provided hashref' : "\$${target}::TEST_ONLYSOME\n");
 #    _printtrace();
 
-    return $arg if ref $arg eq 'HASH';
+    return ($arg, true) if ref $arg eq 'HASH';
 
     # Implicit config: find the caller's package and get $TEST_ONLYSOME
-    return do { no strict 'refs'; ${ "$target" . '::TEST_ONLYSOME' } };
+    return do { no strict 'refs'; (${ "$target" . '::TEST_ONLYSOME' }, false) };
 
 } #_opts()
 
@@ -439,11 +472,11 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 # }}}3
 
-our $VERSION = '0.000_004';
+our $VERSION = '0.000_005';
 
 =head1 VERSION
 
-Version 0.0.4 (dev)
+Version 0.0.5 (dev)
 
 =cut
 
