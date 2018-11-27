@@ -33,6 +33,9 @@ my $secure_perl_path = get_perl_filename();
     } # MY::dist_core
 
     sub postamble {     # TODO also handle Windows nmake syntax (SET vs. export)
+        # Note: pod2markdown is marked with a hyphen so that `make` can
+        # succeed and generate META files even if Pod::Markdown is not yet
+        # installed.
         return <<EOT;
 authortest:
 \tRELEASE_TESTING=1 prove -l xt
@@ -41,7 +44,7 @@ testhere:   # Run the tests from lib rather than blib
 \tprove -lj4
 
 README.md: lib/Test/OnlySome.pm
-\tpod2markdown \$< > \$@
+\t-pod2markdown \$< > \$@
 
 all :: README.md
 dist :: README.md

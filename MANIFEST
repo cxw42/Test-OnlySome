@@ -1,7 +1,4 @@
 Changes
-foo.toml
-foo.txt
-foo.yml
 lib/Test/OnlySome.pm
 LICENSE
 Makefile.PL
