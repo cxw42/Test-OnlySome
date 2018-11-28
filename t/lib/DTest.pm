@@ -4,6 +4,7 @@ package DTest;
 use feature qw(:5.12);
 use strict;
 use warnings;
+use File::Spec;
 
 use parent 'Exporter';
 use Import::Into;
@@ -14,7 +15,7 @@ use Test::More;
 use Carp qw(carp croak);
 use constant { true => !!1, false => !!0 };
 
-our @EXPORT = qw(int2ascii alen tokencopy contains_string true false);
+our @EXPORT = qw(int2ascii alen tokencopy contains_string true false localpath);
 
 sub contains_string($$;$) {   # Adapted from Test::LongString {{{1
     my ($str,$sub,$name) = @_;
@@ -69,6 +70,21 @@ sub tokencopy { # Return the string we expect as a copy of the input. {{{1
     my $token = shift or croak;
     return alen($token) . $token;
 } #tokencopy }}}1
+
+sub localpath { # Return the path to a file in the same directory as the caller {{{1
+    my $newfn = shift or croak 'Need a filename';
+
+    my ($package, $filename, $line) = caller;
+
+    $filename = 'dummy' unless $filename && $filename ne '-e';
+        # Dummy filename assumed to be in cwd, if we're running from -e
+        # or are otherwise without a caller.
+    $filename = File::Spec->rel2abs($filename);
+        # Assume the code up to this point hasn't changed cwd
+    my $voldir = [File::Spec->splitpath($filename)];
+
+    return File::Spec->catpath($voldir->[0], $voldir->[1], $newfn)
+} #}}}1
 
 sub import { # {{{1
     my $target = caller;
