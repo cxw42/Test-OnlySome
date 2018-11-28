@@ -1,5 +1,6 @@
-^.editorconfig
-.swp$
+^\.editorconfig
+^\.[^\\\/]*\.yml
+\.swp$
 ~$
 ^~
 \bfoo\b.*

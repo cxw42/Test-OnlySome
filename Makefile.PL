@@ -85,7 +85,11 @@ WriteMakefile(
         'Test::Kit' => '2.14',
     },
     PREREQ_PM => {
+        'Best' => '0.11',   # Because single-method imports work in 0.11+
         'Data::Dumper' => '0',
+        #'File::Slurp' => '9999.19',     # because in this ver write_file
+        #                                # works in the presence of signals
+        'File::Spec' => '0',
         'Keyword::Declare'  => '0.001006',
         'Scalar::Util' => '1.39',
         'vars' => '0',
@@ -93,6 +97,7 @@ WriteMakefile(
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
+
         resources => {
             repository => {
                 type => 'git',
@@ -100,7 +105,19 @@ WriteMakefile(
                 web  => 'https://github.com/cxw42/Test-OnlySome',
             },
         },
-    },
+
+        prereqs => {
+            runtime => {
+                requires => {
+                    'YAML' => '0',
+                },
+                recommends => {
+                    'YAML::XS' => '0',
+                },
+            },
+        },
+
+    }, #META_MERGE
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Test-OnlySome-*' },
 );
