@@ -2,7 +2,10 @@
 /tags
 *.stackdump
 core
+
+# Outputs this distribution generates
 .onlysome.yml
+t/*.out
 
 # Dist
 Test-OnlySome-*

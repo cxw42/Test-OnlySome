@@ -21,7 +21,7 @@ sub get_perl_filename {
 
 my $secure_perl_path = get_perl_filename();
 
-# Set up Makefile to generate README.md {{{1
+# Set up Makefile to generate README.md and uninstall {{{1
 {   package MY;
 
     # dist_core: make `dist` a :: target rather than a : target.
@@ -48,6 +48,25 @@ README.md: lib/Test/OnlySome.pm
 
 all :: README.md
 dist :: README.md
+
+# Uninstallation: mimic what the normal "uninstall" target does, but actually
+# carry out the actions.
+# Note: this may leave empty directories in place, since the packlist only
+# includes files.
+
+ACTUALLY_UNINSTALL = "$secure_perl_path" -MExtUtils::Install -e 'uninstall(shift,1)' --
+
+actually_uninstall :: actually_uninstall_from_\$(INSTALLDIRS)dirs
+\t\$(NOECHO) \$(NOOP)
+
+actually_uninstall_from_perldirs ::
+\t-\$(ACTUALLY_UNINSTALL) "\$(PERL_ARCHLIB)/auto/\$(FULLEXT)/.packlist"
+
+actually_uninstall_from_sitedirs ::
+\t-\$(ACTUALLY_UNINSTALL) "\$(SITEARCHEXP)/auto/\$(FULLEXT)/.packlist"
+
+actually_uninstall_from_vendordirs ::
+\t-\$(ACTUALLY_UNINSTALL) "\$(VENDORARCHEXP)/auto/\$(FULLEXT)/.packlist"
 
 EOT
 
@@ -77,6 +96,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     TEST_REQUIRES => {
+        'App::Prove' => '0',
         'constant' => '0',
         'Test::Fatal' => '0',
         'Test::Kit' => '2.14',

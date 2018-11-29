@@ -53,11 +53,22 @@ sub summary {
 
         # Pick the output filename based on the first test file we encounter.
         # Put it in the directory above that file.
-        unless($destfn) {
+        DESTFN: {unless($destfn) {
+            my $given_fn = $App::Prove::Plugin::Test::OnlySomeP::Filename;
+                # The plugin guarantees this exists.
+
+            # Accept absolute paths
+            if(File::Spec->file_name_is_absolute($fn)) {
+                $destfn = $given_fn;
+                #print STDERR "Formatter: Output to absolute path $given_fn\n";
+                last DESTFN;
+            }
+
+            # Process relative paths
             my ($volume,$directories,$file) = File::Spec->splitpath(
                 File::Spec->rel2abs($fn) );
             $directories = File::Spec->catdir($directories);
-                # Trim trailing slash , if any
+                # Trim trailing slash, if any
 
             my @dirs = File::Spec->splitdir($directories);
             pop @dirs;
@@ -66,11 +77,10 @@ sub summary {
             #    $App::Prove::Plugin::Test::OnlySomeP::Filename . "\n";
 
             $destfn = File::Spec->catpath($volume,
-                File::Spec->catdir(@dirs),
-                $App::Prove::Plugin::Test::OnlySomeP::Filename);
+                File::Spec->catdir(@dirs), $given_fn);
 
             #print STDERR "Writing output to $destfn\n";
-        }
+        }}
 
         # Save the results for this test file
         $results{$fn} = {};

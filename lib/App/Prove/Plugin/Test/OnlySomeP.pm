@@ -47,7 +47,7 @@ The entry point for the plugin.
 sub load {
     my ($class, $prove) = @_;
     my %args = @{ $prove->{args} };
-    print STDERR __PACKAGE__, " $VERSION loading\n";    # " with args ", Dumper(\%args), "\n";
+    print STDERR '# ', __PACKAGE__, " $VERSION loading\n";    # " with args ", Dumper(\%args), "\n";
 
     $Filename = $args{filename} // DEFAULT_FILENAME;
     #print STDERR "Output filename is $Filename\n";
@@ -138,5 +138,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # }}}3
 1;
-
 # vi: set fdm=marker fdl=2: #

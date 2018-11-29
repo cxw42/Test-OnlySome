@@ -4,6 +4,7 @@
 ~$
 ^~
 \bfoo\b.*
+t/.*\.out$
 
 ^aggregate.pl$
 

@@ -30,6 +30,7 @@ t/31-import-into-from-nested.t
 t/32-test-kit-from-nested.t
 t/41-load-rerun-failed.t
 t/42-rerun-failed.t
+t/43-plugin-output.t
 t/allkinds.test
 t/allkinds.yml
 t/lib/DImportInto.pm
