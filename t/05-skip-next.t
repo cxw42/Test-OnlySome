@@ -42,6 +42,6 @@ ok(1, 'Test 9');
 
 is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true}, n=>2},
     'Options structure is what we set');
-is_deeply($TEST_ONLYSOME, {}, '$TEST_ONLYSOME is empty');
+is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}}, '$TEST_ONLYSOME has only the default content');
 
 done_testing();

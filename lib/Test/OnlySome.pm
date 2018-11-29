@@ -175,12 +175,16 @@ sub import {
         $hrTOS = ${ $target . '::TEST_ONLYSOME' };
     };
 
+    $hrTOS->{n} = 1 unless $hrTOS->{n};
+    $hrTOS->{skip} = {} unless $hrTOS->{skip};
+
     # Check the arguments.  Numeric arguments are tests to skip.
     my $curr_keyword = '';
     foreach(@_) {
         if(/^skip/) { $curr_keyword='skip'; next; }
 
         if ( $curr_keyword eq 'skip' && _is_testnum ) {
+            #print STDERR "TOS skipping $_\n";
             $hrTOS->{skip}->{$_} = true;
             next;
         }
@@ -472,11 +476,11 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 # }}}3
 
-our $VERSION = '0.000_005';
+our $VERSION = '0.000005';
 
 =head1 VERSION
 
-Version 0.0.5 (dev)
+Version 0.0.5
 
 =cut
 

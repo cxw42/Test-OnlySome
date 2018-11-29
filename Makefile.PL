@@ -62,9 +62,6 @@ WriteMakefile(
     LICENSE          => 'mit',
     PL_FILES         => {},
 
-    # Skip aggregate.pl
-    PM => {'lib/Test/OnlySome.pm' => '$(INST_LIB)/Test/OnlySome.pm'},
-
     MIN_PERL_VERSION => '5.012',    # required by Keyword::Declare
     CONFIGURE_REQUIRES => {
         'Config' => '0',

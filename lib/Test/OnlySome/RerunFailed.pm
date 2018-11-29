@@ -8,23 +8,46 @@ use Carp qw(croak);
 use Import::Into;
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
-#use Data::Dumper;
+# Docs {{{2
 
-use constant FILENAME => '.onlysome.yml';   # TODO make this a parameter
+=head1 NAME
+
+Test::OnlySome::RerunFailed - Load Test::OnlySome, and skip tests based on a file on disk
+
+=head1 INSTALLATION
+
+See L<Test::OnlySome>, with which this module is distributed.
+
+=cut
+
+# }}}2
+
+use constant DEFAULT_FILENAME => '.onlysome.yml';   # TODO make this a parameter
 
 sub import {
-    my ($target, $filename) = caller;
-    #print STDERR "Called from $filename\n";
-    # TODO read the YAML file
-    my $fn = _localpath(1, FILENAME, 1);
-    #print STDERR "Reading YAML from $fn\n";
+    my $self = shift;
+    my %opts = @_;
+    my ($target, $caller_fn) = caller;
+
+    # Process options
+    $opts{filename} //= DEFAULT_FILENAME;
+
+    #print STDERR "Called from $target in $caller_fn; YML in $opts{filename}\n";
+
+    # Read the YAML file
+    my $fn = _localpath(1, $opts{filename}, 1);
     my $hrCfg = LoadFile($fn);
     #print STDERR Dumper($hrCfg);
 
     # TODO pick the numbers to skip
     my @skips;
-    @skips = @{ $hrCfg->{$filename}->{passed} } if $hrCfg->{$filename}->{passed};
-    #print STDERR "Skipping ", join(", ", @skips), "\n";
+    if($hrCfg->{$caller_fn}->{actual_passed}) {
+        my %skipped = map { $_ => 1 }
+            @{ $hrCfg->{$caller_fn}->{skipped} // \() };
+        @skips = grep { !$skipped{$_} } @{ $hrCfg->{$caller_fn}->{actual_passed} };
+        #print STDERR "Skipping ", join(", ", @skips), "\n";
+    }
+
     # Load Test::OnlySome with the appropriate skips
     'Test::OnlySome'->import::into($target, @skips ? 'skip' : (), @skips);
 }
@@ -59,6 +82,14 @@ sub _localpath { # Return the path to a file in the same directory as the caller
     return File::Spec->catpath($vol, $dir, $newfn)
 } #}}}2
 
+our $VERSION = '0.000005';
+
+=head1 VERSION
+
+Version 0.0.5
+
+=cut
+
 1;
 
-# vi: set fdm=marker fdl=1:
+# vi: set fdm=marker fdl=1 fo-=ro:

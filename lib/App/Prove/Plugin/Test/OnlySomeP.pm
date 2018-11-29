@@ -88,11 +88,11 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 # }}}3
 
-our $VERSION = '0.000_005';
+our $VERSION = '0.000005';
 
 =head1 VERSION
 
-Version 0.0.5 (dev)
+Version 0.0.5
 
 =cut
 
