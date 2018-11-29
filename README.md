@@ -178,10 +178,6 @@ You can also look for information at:
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome)
 
-# VERSION
-
-Version 0.0.6
-
 # LICENSE AND COPYRIGHT
 
 Copyright 2018 Christopher White.

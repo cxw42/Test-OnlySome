@@ -8,19 +8,7 @@ use Carp qw(croak);
 use Import::Into;
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
-# Docs {{{2
-
-=head1 NAME
-
-Test::OnlySome::RerunFailed - Load Test::OnlySome, and skip tests based on a file on disk
-
-=head1 INSTALLATION
-
-See L<Test::OnlySome>, with which this module is distributed.
-
-=cut
-
-# }}}2
+our $VERSION = '0.000006';
 
 use constant DEFAULT_FILENAME => '.onlysome.yml';   # TODO make this a parameter
 
@@ -28,9 +16,7 @@ use constant DEFAULT_FILENAME => '.onlysome.yml';   # TODO make this a parameter
 
 =head1 NAME
 
-Test::OnlySome::RerunFailed - load Test::OnlySome and intialize skips
-
-- prove plugin supporting Test::OnlySome
+Test::OnlySome::RerunFailed - Load Test::OnlySome, and skip tests based on a file on disk
 
 =head1 INSTALLATION
 
@@ -105,14 +91,5 @@ sub _localpath { # Return the path to a file in the same directory as the caller
     return File::Spec->catpath($vol, $dir, $newfn)
 } #}}}2
 
-our $VERSION = '0.000006';
-
-=head1 VERSION
-
-Version 0.0.6
-
-=cut
-
 1;
-
 # vi: set fdm=marker fdl=1 fo-=ro:

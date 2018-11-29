@@ -15,6 +15,8 @@ use constant { true => !!1, false => !!0 };
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
+our $VERSION = '0.000006';
+
 # TODO move $TEST_NUMBER_OS into the options structure.
 
 # Docs {{{3
@@ -404,7 +406,7 @@ sub _printtrace {
 # }}}2
 # }}}1
 
-# More docs, and $VERSION {{{3
+# More docs {{{3
 =head1 VARIABLES
 
 =head2 C<$TEST_NUMBER_OS>
@@ -475,15 +477,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 =cut
 
 # }}}3
-
-our $VERSION = '0.000006';
-
-=head1 VERSION
-
-Version 0.0.6
-
-=cut
-
 # License {{{3
 
 =head1 LICENSE AND COPYRIGHT
