@@ -4,6 +4,16 @@ use 5.012;
 use strict;
 use warnings;
 use Carp qw(croak);
+#use Data::Dumper;
+
+our $VERSION = '0.000006';
+use constant DEFAULT_FILENAME => '.onlysome.yml';
+
+our $Filename;  # The output filename to use, where the formatter can read it.
+
+# TODO someday: find a cleaner way to pass the filename to the formatter.  I am
+# not instantiating the formatter here because I don't want to remove
+# prove(1)'s control of the formatter options.
 
 # Docs {{{3
 
@@ -36,13 +46,16 @@ The entry point for the plugin.
 
 sub load {
     my ($class, $prove) = @_;
+    my %args = @{ $prove->{args} };
+    print STDERR __PACKAGE__, " $VERSION loading\n";    # " with args ", Dumper(\%args), "\n";
 
-    print STDERR __PACKAGE__, " loading\n";
+    $Filename = $args{filename} // DEFAULT_FILENAME;
+    #print STDERR "Output filename is $Filename\n";
     $prove->{app_prove}->formatter('App::Prove::Plugin::Test::OnlySomeP::Formatter');
-} #skip_these()
+} #load()
 
 # }}}1
-# More docs, and $VERSION {{{3
+# More docs {{{3
 =head1 AUTHOR
 
 Christopher White, C<< <cxwembedded at gmail.com> >>
@@ -87,15 +100,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 =cut
 
 # }}}3
-
-our $VERSION = '0.000006';
-
-=head1 VERSION
-
-Version 0.0.6
-
-=cut
-
 # License {{{3
 
 =head1 ACKNOWLEDGEMENTS
