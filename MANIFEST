@@ -38,6 +38,7 @@ t/lib/DTestKit.pm
 t/lib/Nested/DImportInto.pm
 t/lib/Nested/DTestKit.pm
 xt/boilerplate.t
+xt/changes.t
 xt/manifest.t
 xt/pod-coverage.t
 xt/pod.t

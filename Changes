@@ -18,8 +18,16 @@ Revision history for Test-OnlySome
 
     - Support package args to specify which tests to skip
 
-0.0_5   2018-??
+0.0.5   2018-11-28
 
     - Package args now use a "skip" keyword ahead of the test numbers
       to skip.
     - Test numbers must be >= 1.
+    - Added App::Prove plugin to collect test results
+    - Added loader module Test::OnlySome::RerunFailed to load the collected
+      test results and mark all cleanly-passed tests in a file to be skipped
+      by Test::OnlySome.
+
+0.0.6   2018-11-29
+
+    - Updated documentation

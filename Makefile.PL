@@ -104,6 +104,12 @@ WriteMakefile(
         },
 
         prereqs => {
+            develop => {
+                requires => {
+                    'File::Grep' => '0',
+                    'DateTime' => '0',
+                },
+            },
             runtime => {
                 requires => {
                     'YAML' => '0',

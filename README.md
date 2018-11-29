@@ -180,7 +180,7 @@ You can also look for information at:
 
 # VERSION
 
-Version 0.0.5
+Version 0.0.6
 
 # LICENSE AND COPYRIGHT
 

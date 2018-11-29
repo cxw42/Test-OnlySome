@@ -24,6 +24,29 @@ See L<Test::OnlySome>, with which this module is distributed.
 
 use constant DEFAULT_FILENAME => '.onlysome.yml';   # TODO make this a parameter
 
+# Docs {{{2
+
+=head1 NAME
+
+Test::OnlySome::RerunFailed - load Test::OnlySome and intialize skips
+
+- prove plugin supporting Test::OnlySome
+
+=head1 INSTALLATION
+
+See L<Test::OnlySome>, with which this module is distributed.
+
+=head1 USAGE
+
+    use Test::OnlySome::RerunFailed;
+
+This will load L<Test::OnlySome> and configure it to skip any test marked
+as a clean pass by the last run of L<App::Prove::Plugin::Test::OnlySomeP>.
+
+=cut
+
+# }}}2
+
 sub import {
     my $self = shift;
     my %opts = @_;
@@ -82,11 +105,11 @@ sub _localpath { # Return the path to a file in the same directory as the caller
     return File::Spec->catpath($vol, $dir, $newfn)
 } #}}}2
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 =head1 VERSION
 
-Version 0.0.5
+Version 0.0.6
 
 =cut
 
