@@ -80,6 +80,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Test/OnlySome.pm',
     LICENSE          => 'mit',
     PL_FILES         => {},
+    EXE_FILES       => [ 'bin/osprove' ],
 
     MIN_PERL_VERSION => '5.012',    # required by Keyword::Declare
     CONFIGURE_REQUIRES => {
@@ -107,6 +108,7 @@ WriteMakefile(
         #'File::Slurp' => '9999.19',     # because in this ver write_file
         #                                # works in the presence of signals
         'File::Spec' => '0',
+        'Getopt::Long' => '2.5',
         'Keyword::Declare'  => '0.001006',
         'Scalar::Util' => '1.39',
         'vars' => '0',
