@@ -31,3 +31,7 @@ Revision history for Test-OnlySome
 0.0.6   2018-11-29
 
     - Updated documentation
+
+0.0.7   2018-??
+
+    - Added osprove(1) binary to run prove(1) with the Test::OnlyP plugin

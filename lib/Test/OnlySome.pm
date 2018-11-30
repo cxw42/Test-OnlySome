@@ -15,7 +15,7 @@ use constant { true => !!1, false => !!0 };
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 # TODO move $TEST_NUMBER_OS into the options structure.
 

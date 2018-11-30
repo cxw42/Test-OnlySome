@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 #use Data::Dumper;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 use constant DEFAULT_FILENAME => '.onlysome.yml';
 
 our $Filename;  # The output filename to use, where the formatter can read it.

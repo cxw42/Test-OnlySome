@@ -11,7 +11,7 @@ use File::Spec;
 
 #use Data::Dumper;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 # Docs {{{2
 

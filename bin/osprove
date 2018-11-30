@@ -26,6 +26,8 @@ NOTE: run C<prove --help> to see help on the C<...> in those examples.
 use App::Prove;
 use Getopt::Long 2.5 qw(:config gnu_getopt pass_through);
 
+our $VERSION = '0.000007';
+
 # Accept --onlysome <filename>
 my %args;
 GetOptions(\%args, "onlysome=s") or

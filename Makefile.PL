@@ -2,6 +2,7 @@ use 5.012;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 use Config;
 
 # Get the filename of the Perl interpreter running this. {{{1
@@ -90,6 +91,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'Config' => '0',
         'ExtUtils::MakeMaker' => '0',
+        'Module::Metadata' => '1.000016',
     },
     BUILD_REQUIRES => {
         'Carp' => '0',
@@ -145,6 +147,9 @@ WriteMakefile(
                 },
             },
         },
+
+        # Thanks to https://stackoverflow.com/a/28928985/2877364 by LEONT
+        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
 
     }, #META_MERGE
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

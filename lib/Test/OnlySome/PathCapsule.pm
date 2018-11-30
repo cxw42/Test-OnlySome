@@ -1,6 +1,6 @@
 #!perl
 
-package Test::OnlySome::PathUtil;
+package Test::OnlySome::PathCapsule;
 use 5.012;
 use strict;
 use warnings;
@@ -10,13 +10,13 @@ use Cwd qw(cwd);
 
 use constant { true => !!1, false => !!0 };
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 # Docs {{{2
 
 =head1 NAME
 
-Test::OnlySome::PathUtil - yet another object-oriented path representation
+Test::OnlySome::PathCapsule - yet another object-oriented path representation
 
 =head1 INSTALLATION
 
@@ -24,14 +24,14 @@ See L<Test::OnlySome>, with which this module is distributed.
 
 =head1 SYNOPSIS
 
-    use Test::OnlySome::PathUtil;
-    my $path = Test::OnlySome::PathUtil->new('some/path')
-    my $cwd = Test::OnlySome::PathUtil->new()
+    use Test::OnlySome::PathCapsule;
+    my $path = Test::OnlySome::PathCapsule->new('some/path')
+    my $cwd = Test::OnlySome::PathCapsule->new()
 
     $path->up()         # move to the parent dir, if any
     $path->down('foo')  # move to dir 'foo'
 
-Test::OnlySome::PathUtil doesn't care whether the path actually exists on disk.
+Test::OnlySome::PathCapsule doesn't care whether the path actually exists on disk.
 
 =head1 CREATING AND MODIFYING
 
@@ -43,7 +43,7 @@ Test::OnlySome::PathUtil doesn't care whether the path actually exists on disk.
 
 Create a new instance.
 
-    my $path = Test::OnlySome::PathUtil->new([$pathname_string[, $is_dir = 0]])
+    my $path = Test::OnlySome::PathCapsule->new([$pathname_string[, $is_dir = 0]])
 
 If C<$pathname_string> is given, the instance points at that path.  Otherwise,
 the instance points at cwd.  If C<$is_dir>, C<$pathname_string> points at a
@@ -100,7 +100,10 @@ sub up {
     my $self = shift or croak "Need an instance";
     my $keep_filename = shift // false;
     pop @{ $self->{_dirs} };
-    $self->{_file} = '' unless $keep_filename;
+    unless($keep_filename) {
+        $self->{_file} = '';
+        $self->{_is_dir} = true;
+    }
     return $self;
 } #up
 
@@ -156,6 +159,17 @@ sub file {
 } #file
 
 =head1 ACCESSING
+
+=head2 is_dir
+
+Returns true if the instance represents a directory as opposed to a file.
+
+=cut
+
+sub is_dir {
+    my $self = shift or croak "Need an instance";
+    return !!$self->{_is_dir};
+} #is_dir()
 
 =head2 abs
 

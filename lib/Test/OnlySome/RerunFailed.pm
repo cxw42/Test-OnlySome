@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Import::Into;
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use constant DEFAULT_FILENAME => '.onlysome.yml';   # TODO make this a parameter
 
