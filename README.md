@@ -90,61 +90,6 @@ not in the caller's scope.
 
 Removes the ["os"](#os) keyword definition.
 
-# INTERNALS
-
-## \_gen
-
-This routine generates source code that, at runtime, will execute a given
-only-some test.
-
-## \_is\_testnum
-
-Return True if the provided parameter, or `$_`, is a valid test number.
-
-## \_opts
-
-Returns the appropriate options hashref, and an indication of whether
-the caller should `shift` (true for explicit config).  Call as `_opts($_[0])`.
-
-## \_nexttestnum
-
-Gets the caller's current `$TEST_NUMBER_OS` value.
-
-## \_escapekit
-
-Find the caller using a Test::Kit package that uses us, so we can import
-the keyword the right place.
-
-## \_printtrace
-
-Print a full stack trace
-
-# VARIABLES
-
-## `$TEST_NUMBER_OS`
-
-Exported into the caller's package.  A sequential numbering of tests that
-have been run under ["os"](#os).
-
-## `$TEST_ONLYSOME` (Options hashref)
-
-Exported into the caller's package.  A hashref of options, of the same format
-as an explicit-config hashref.  Keys are:
-
-- `n`
-
-    The number of tests in each ["os"](#os) call.
-
-- `skip`
-
-    A hashref of tests to skip.  Test numbers are keys; any truthy
-    value will indicate that the ["os"](#os) call beginning with that test number
-    should be skipped.
-
-# AUTHOR
-
-Christopher White, `<cxwembedded at gmail.com>`
-
 # BUGS
 
 Please report any bugs or feature requests on GitHub, at

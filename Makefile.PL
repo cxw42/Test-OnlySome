@@ -21,7 +21,7 @@ sub get_perl_filename {
 
 my $secure_perl_path = get_perl_filename();
 
-# Set up Makefile to generate README.md and uninstall {{{1
+# Set up Makefile to generate README.md and uninstall targets {{{1
 {   package MY;
 
     # dist_core: make `dist` a :: target rather than a : target.
@@ -33,9 +33,11 @@ my $secure_perl_path = get_perl_filename();
     } # MY::dist_core
 
     sub postamble {     # TODO also handle Windows nmake syntax (SET vs. export)
+
         # Note: pod2markdown is marked with a hyphen so that `make` can
         # succeed and generate META files even if Pod::Markdown is not yet
         # installed.
+
         return <<EOT;
 authortest:
 \tRELEASE_TESTING=1 prove -l xt
@@ -43,8 +45,10 @@ authortest:
 testhere:   # Run the tests from lib rather than blib
 \tprove -lj4
 
-README.md: lib/Test/OnlySome.pm
-\t-pod2markdown \$< > \$@
+README.md: lib/Test/OnlySome.pm Makefile.PL
+\t-pod2markdown \$< | \\
+\t$secure_perl_path -ne 'print if /BUGS/; next if /INTERNALS/../BUGS/; print' \\
+> \$@
 
 all :: README.md
 dist :: README.md

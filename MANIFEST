@@ -1,7 +1,9 @@
+bin/osprove
 Changes
 lib/App/Prove/Plugin/Test/OnlySomeP.pm
 lib/App/Prove/Plugin/Test/OnlySomeP/Formatter.pm
 lib/Test/OnlySome.pm
+lib/Test/OnlySome/PathUtil.pm
 lib/Test/OnlySome/RerunFailed.pm
 LICENSE
 Makefile.PL
