@@ -10,12 +10,15 @@ use App::Prove;
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
 my $test_fn = localpath("allkinds.test");   # the test file to run
+diag "=========== Running tests in $test_fn under App::Prove";
 
 # Test specified filename
 my $results_fn = localpath '43.out';
 unlink $results_fn if -e $results_fn;
 
 run_prove('-PTest::OnlySomeP=filename,' . $results_fn);
+
+diag "=========== Done running tests in $test_fn under App::Prove";
 
 ok(-e $results_fn, "Output file exists");
 
@@ -32,7 +35,8 @@ exit(0);
 sub run_prove {
     my $app = App::Prove->new;
     $app->process_args(
-        qw(-Q --norc --state=all),   # Isolate us from the environment
+        qw(-Q --norc --state=all),  # Isolate us from the environment
+        qw(-l),                     # DTest relies on Test::OnlySome::PathCapsule
         $test_fn,
         @_
     );

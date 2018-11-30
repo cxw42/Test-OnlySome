@@ -7,7 +7,6 @@ use warnings;
 use parent 'TAP::Formatter::Console';   # TODO make the parent a parameter
 
 use Best [ [qw(YAML::XS YAML)], qw(DumpFile) ];
-use File::Spec;
 
 #use Data::Dumper;
 
@@ -42,7 +41,7 @@ Called after the tests run.  Outputs the test results to a YAML file.
 sub summary {
     my $self = shift;
     my ($aggregate, $interrupted) = @_;
-    my ($destfn, %results);
+    my %results;
 
     $self->SUPER::summary(@_);
 
@@ -50,52 +49,15 @@ sub summary {
     # already iterated over the results.
 
     while( my ($fn, $parser) = each %{$aggregate->{parser_for}} ) {
-
-        # Pick the output filename based on the first test file we encounter.
-        # Put it in the directory above that file.
-        DESTFN: {unless($destfn) {
-            my $given_fn = $App::Prove::Plugin::Test::OnlySomeP::Filename;
-                # The plugin guarantees this exists.
-
-            # Accept absolute paths
-            if(File::Spec->file_name_is_absolute($fn)) {
-                $destfn = $given_fn;
-                #print STDERR "Formatter: Output to absolute path $given_fn\n";
-                last DESTFN;
-            }
-
-            # Process relative paths
-            my ($volume,$directories,$file) = File::Spec->splitpath(
-                File::Spec->rel2abs($fn) );
-            $directories = File::Spec->catdir($directories);
-                # Trim trailing slash, if any
-
-            my @dirs = File::Spec->splitdir($directories);
-            pop @dirs;
-
-            #print STDERR "Formatter: Output filename is " .
-            #    $App::Prove::Plugin::Test::OnlySomeP::Filename . "\n";
-
-            $destfn = File::Spec->catpath($volume,
-                File::Spec->catdir(@dirs), $given_fn);
-
-            #print STDERR "Writing output to $destfn\n";
-        }}
-
         # Save the results for this test file
         $results{$fn} = {};
         $results{$fn}->{$_} = _ary($parser->$_)
             for qw(passed failed skipped actual_passed actual_failed todo todo_passed);
-
     } #foreach result file
 
     # Save the output
-    if($destfn) {
-        DumpFile $destfn, \%results;
-    } else {
-        warn "# No tests to report on";
-    }
-
+    DumpFile $App::Prove::Plugin::Test::OnlySomeP::Filename, \%results;
+        # The plugin guarantees this exists.
 } #summary()
 
 # Wrap the arg(s) in an arrayref unless the first arg already is one.

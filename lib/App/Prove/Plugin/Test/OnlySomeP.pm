@@ -4,6 +4,7 @@ use 5.012;
 use strict;
 use warnings;
 use Carp qw(croak);
+use Test::OnlySome::PathCapsule;
 #use Data::Dumper;
 
 our $VERSION = '0.000007';
@@ -49,7 +50,9 @@ sub load {
     my %args = @{ $prove->{args} };
     print STDERR '# ', __PACKAGE__, " $VERSION loading\n";    # " with args ", Dumper(\%args), "\n";
 
-    $Filename = $args{filename} // DEFAULT_FILENAME;
+    $Filename = Test::OnlySome::PathCapsule->new(
+        $args{filename} // DEFAULT_FILENAME
+    )->abs();
     #print STDERR "Output filename is $Filename\n";
     $prove->{app_prove}->formatter('App::Prove::Plugin::Test::OnlySomeP::Formatter');
 } #load()

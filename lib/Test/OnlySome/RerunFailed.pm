@@ -8,6 +8,8 @@ use Carp qw(croak);
 use Import::Into;
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
+use Test::OnlySome::PathCapsule;
+
 our $VERSION = '0.000007';
 
 use constant DEFAULT_FILENAME => '.onlysome.yml';   # TODO make this a parameter
@@ -72,23 +74,13 @@ sub _localpath { # Return the path to a file in the same directory as the caller
         # Dummy filename assumed to be in cwd, if we're running from -e
         # or are otherwise without a caller.
 
-    $filename = File::Spec->rel2abs($filename);
+    my $path = Test::OnlySome::PathCapsule->new($filename);
         # Assume the code up to this point hasn't changed cwd
 
-    #print STDERR "abs: $filename\n";
-    my ($vol, $dir, $file) = File::Spec->splitpath($filename);
-    $dir = File::Spec->catdir($dir);
-        # Trim trailing slash , if any
+    $path->up while $moveup--;
+    $path->file($newfn);
 
-    if($moveup) {
-        my @dirs = File::Spec->splitdir($dir);
-        #print STDERR "Dirs before: ", join "\n", @dirs, "\n";
-        pop @dirs while $moveup--;
-        #print STDERR "Dirs after ", join "\n", @dirs, "\n";
-        $dir = File::Spec->catdir(@dirs);
-    }
-
-    return File::Spec->catpath($vol, $dir, $newfn)
+    return $path->abs;
 } #}}}2
 
 1;
