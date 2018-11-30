@@ -44,7 +44,7 @@ Manually: clone or untar into a working directory.  Then, in that directory,
 If some of the tests fail, please check the issues and file a new one if
 no one else has reported the problem yet.
 
-=head1 USAGE
+=head1 SYNOPSIS
 
     use Test::More;
     use Test::OnlySome;

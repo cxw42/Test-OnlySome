@@ -9,29 +9,42 @@ use DTest;
 use App::Prove;
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
+my $test_fn = localpath("allkinds.test");   # the test file to run
+
+# Test specified filename
 my $results_fn = localpath '43.out';
 unlink $results_fn if -e $results_fn;
 
-my $test_fn = localpath("allkinds.test");   # the test file to run
-
-# Run prove().  TODO: Swallow stdout and stderr while this is running, so
-# that the intentional failures in t/allkinds.test don't confuse the output.
-my $app = App::Prove->new;
-$app->process_args(
-    qw(-Q --norc --state=all),   # Isolate us from the environment
-    '-PTest::OnlySomeP=filename,' . $results_fn,
-    $test_fn
-);
-$app->run;
+run_prove('-PTest::OnlySomeP=filename,' . $results_fn);
 
 ok(-e $results_fn, "Output file exists");
 
-my $results = LoadFile $results_fn;
-
-ok(ref $results eq 'HASH', "Result file is valid YAML");
-
-ok($results->{$test_fn}, "Result file has an entry for $test_fn");
+check_results($results_fn);
 
 # TODO test the content of $results
 
 done_testing();
+
+exit(0);
+
+# Run prove().  TODO: Swallow stdout and stderr while this is running, so
+# that the intentional failures in t/allkinds.test don't confuse the output.
+sub run_prove {
+    my $app = App::Prove->new;
+    $app->process_args(
+        qw(-Q --norc --state=all),   # Isolate us from the environment
+        $test_fn,
+        @_
+    );
+    $app->run;
+}
+
+sub check_results {
+    my $results_fn = shift;
+    my $results = LoadFile $results_fn;
+
+    ok(ref $results eq 'HASH', "Result file is valid YAML");
+
+    ok($results->{$test_fn}, "Result file has an entry for $test_fn");
+}
+

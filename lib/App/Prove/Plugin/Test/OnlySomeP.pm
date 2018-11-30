@@ -25,7 +25,7 @@ App::Prove::Plugin::Test::OnlySomeP - prove plugin supporting Test::OnlySome
 
 See L<Test::OnlySome>, with which this module is distributed.
 
-=head1 USAGE
+=head1 SYNOPSIS
 
     prove -PTest::OnlySomeP
 

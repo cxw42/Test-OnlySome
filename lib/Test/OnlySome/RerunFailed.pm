@@ -22,7 +22,7 @@ Test::OnlySome::RerunFailed - Load Test::OnlySome, and skip tests based on a fil
 
 See L<Test::OnlySome>, with which this module is distributed.
 
-=head1 USAGE
+=head1 SYNOPSIS
 
     use Test::OnlySome::RerunFailed;
 
