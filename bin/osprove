@@ -13,6 +13,8 @@ osprove - Run prove with -PTest::OnlySomeP
 
 NOTE: run C<prove --help> to see help on the C<...> in those examples.
 
+See L<Test::OnlySome> for full documentation.
+
 =cut
 
 # The note about "prove --help" is because the help option in App::Prove uses

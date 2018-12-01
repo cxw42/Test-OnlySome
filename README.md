@@ -23,8 +23,42 @@ no one else has reported the problem yet.
 
 # SYNOPSIS
 
-    use Test::More;
-    use Test::OnlySome;
+In your test file (e.g., `t/01.t`):
+
+    use Test::More tests => 2;
+    use Test::OnlySome::RerunFailed;    # rerun only failed tests
+    os ok(1, 'passes');     # "os" marks tests that might be skipped
+    os ok(0, 'fails');
+
+At the command line:
+
+    $ osprove -lv
+    ...
+    ok 1 - passes
+    not ok 2 - fails
+    ...
+    Result: FAIL
+
+This creates `.onlysome.yml`, which holds the test results from `t/01.t`.
+Then, re-run:
+
+    $ osprove -lv
+    ...
+    ok 1 # skip Test::OnlySome: you asked me to skip this
+    not ok 2 - fails
+    ...
+
+Since test 1 passed the first time, it was skipped the second time.
+
+You don't have to use `Test::OnlySome::RerunFailed`.  You can directly
+use `Test::OnlySome`, and you can decide in some other way which tests
+you want to skip.
+
+The argument to ["os"](#os) can be a statement or block, and it doesn't have to
+be a [Test::More](https://metacpan.org/pod/Test::More) test.  You can wrap long-running tests in functions,
+and apply ["os"](#os) to those functions.
+
+# MARKING TESTS
 
 You can pick which tests to skip using implicit or explicit configuration.
 Explicit configuration uses a hashref:
