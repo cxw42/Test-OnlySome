@@ -41,7 +41,7 @@ ok(1, 'Test 9');
 
 is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true}, n=>2},
     'Options structure is what we set');
-is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}}, '$TEST_ONLYSOME has only the default content');
+is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}, verbose=>0}, '$TEST_ONLYSOME has only the default content');
 
 dies_ok {
     skip_these $hrOpts, 'not-a-number!';

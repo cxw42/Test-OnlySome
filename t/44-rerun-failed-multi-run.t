@@ -14,8 +14,9 @@ use Test2::Tools::Compare Renaming => [ like => 'struct_like' ];
 no Exporter::Renaming;
 
 use Data::Dumper;
+use Capture::Tiny qw(capture);
 
-exit main();
+main();
 
 sub main {
     my $test_fn = localpath 'rerunfailed.test';   # the test file to run
@@ -29,9 +30,16 @@ sub main {
     }
 
     done_testing();
-}
 
-exit(0);
+    #    # Return the same exit code that Test::Builder would have.
+    #    # But we don't need to do this if we don't manually call exit().
+    #    my @summary = Test::More->builder->summary;
+    #    diag Dumper(\@summary);
+    #    my @failures = grep { !$_ } @summary;
+    #    my $exitcode = $#failures+1;
+    #    $exitcode = 254 if $exitcode > 254;
+    #    return $exitcode;
+} #main()
 
 #########################################################################
 
@@ -41,8 +49,8 @@ sub run_prove {
     my $test_fn = shift;
     my $results_fn = shift;
 
-    diag "vvvvvvvvvvv Running tests in $test_fn under App::Prove";
     my $app = App::Prove->new;
+
     $app->process_args(
         qw(--norc --state=all),  # Isolate us from the environment
         qw(-l),                     # DTest relies on Test::OnlySome::PathCapsule
@@ -50,8 +58,20 @@ sub run_prove {
         $test_fn,
         '-PTest::OnlySomeP=filename,' . $results_fn
     );
-    $app->run;
-    diag "^^^^^^^^^^^ Done running tests in $test_fn under App::Prove";
+
+    # prove(1) gets confused by the mixed output from this script and from
+    # the inner App::Prove.  Therefore, capture it.
+    my ($stdout, $stderr, @result) = capture {
+        $app->run;
+    };
+
+    diag "vvvvvvvvvvv Ran tests in $test_fn under App::Prove";
+    diag "  Result was ", join ", ", @result;
+    diag "  STDOUT:";
+    diag $stdout;
+    diag "  STDERR";
+    diag $stderr;
+    diag "^^^^^^^^^^^ End of output from running tests in $test_fn under App::Prove";
 }
 
 sub check_results {

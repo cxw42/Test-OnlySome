@@ -111,6 +111,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'App::Prove' => '0',
+        'Capture::Tiny' => '0',
         'constant' => '0',
         'Exporter::Renaming' => '0',
         'Test::Fatal' => '0',
