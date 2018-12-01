@@ -213,11 +213,18 @@ sub import {
 
     $hrTOS->{n} = 1 unless $hrTOS->{n};
     $hrTOS->{skip} = {} unless $hrTOS->{skip};
+    $hrTOS->{verbose} = 0 unless $hrTOS->{verbose};
 
     # Check the arguments.  Numeric arguments are tests to skip.
     my $curr_keyword = '';
     foreach(@_) {
-        if(/^skip/) { $curr_keyword='skip'; next; }
+        if(/^skip$/) { $curr_keyword='skip'; next; }
+        if(/^verbose$/) { $curr_keyword='verbose'; next; }
+
+        if ( $curr_keyword eq 'verbose' ) {
+            $hrTOS->{verbose} = !!$_;
+            next;
+        }
 
         if ( $curr_keyword eq 'skip' && _is_testnum ) {
             #print STDERR "TOS skipping $_\n";
@@ -227,6 +234,13 @@ sub import {
 
         croak "Test::OnlySome: I can't understand argument '$_'" .
             ($curr_keyword ? " to keyword '$curr_keyword'" : '');
+    } # foreach arg
+
+    if($hrTOS->{verbose}) {
+        my $msg = "# Test::OnlySome $VERSION loading\nConfig:\n" .
+            Dumper($hrTOS);
+        $msg =~ s/^/# /gm;
+        print STDERR $msg;
     }
 
 # `os` keyword - mark each test-calling statement this way {{{2
