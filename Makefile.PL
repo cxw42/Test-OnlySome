@@ -2,8 +2,16 @@ use 5.012;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use Module::Metadata;
 use Config;
+
+# Module metadata {{{1
+my $provides;
+eval {
+    require Module::Metadata;
+    $provides = Module::Metadata->provides(version => '2', dir => 'lib');
+        # Thanks to https://stackoverflow.com/a/28928985/2877364 by LEONT
+};
+# }}}1
 
 # Get the filename of the Perl interpreter running this. {{{1
 # Modified from perlvar.
@@ -91,7 +99,6 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'Config' => '0',
         'ExtUtils::MakeMaker' => '0',
-        'Module::Metadata' => '1.000016',
     },
     BUILD_REQUIRES => {
         'Carp' => '0',
@@ -111,8 +118,6 @@ WriteMakefile(
     PREREQ_PM => {
         'Best' => '0.11',   # Because single-method imports work in 0.11+
         'Data::Dumper' => '0',
-        #'File::Slurp' => '9999.19',     # because in this ver write_file
-        #                                # works in the presence of signals
         'File::Spec' => '0',
         'Getopt::Long' => '2.5',
         'Keyword::Declare'  => '0.001006',
@@ -136,6 +141,7 @@ WriteMakefile(
                 requires => {
                     'File::Grep' => '0',
                     'DateTime' => '0',
+                    'Module::Metadata' => '1.000016',
                 },
             },
             runtime => {
@@ -148,8 +154,7 @@ WriteMakefile(
             },
         },
 
-        # Thanks to https://stackoverflow.com/a/28928985/2877364 by LEONT
-        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
+        $provides ? (provides => $provides) : (),
 
     }, #META_MERGE
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
