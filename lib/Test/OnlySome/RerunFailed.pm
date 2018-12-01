@@ -37,7 +37,8 @@ as a clean pass by the last run of L<App::Prove::Plugin::Test::OnlySomeP>.
 
 sub import {
     my $self = shift;
-    my %opts = @_;
+    my %opts = @_;  # options from the `use` statement
+    my @skips;      # test numbers to skip
     my ($target, $caller_fn) = caller;
 
     # Process options
@@ -47,16 +48,17 @@ sub import {
 
     # Read the YAML file
     my $fn = _localpath(1, $opts{filename}, 1);
-    my $hrCfg = LoadFile($fn);
+    my $hrCfg;
+    eval { $hrCfg = LoadFile($fn); };
     #print STDERR Dumper($hrCfg);
 
-    # TODO pick the numbers to skip
-    my @skips;
-    if($hrCfg->{$caller_fn}->{actual_passed}) {
-        my %skipped = map { $_ => 1 }
-            @{ $hrCfg->{$caller_fn}->{skipped} // \() };
-        @skips = grep { !$skipped{$_} } @{ $hrCfg->{$caller_fn}->{actual_passed} };
-        #print STDERR "Skipping ", join(", ", @skips), "\n";
+    if($hrCfg) {
+        if($hrCfg->{$caller_fn}->{actual_passed}) {
+            my %skipped = map { $_ => 1 }
+                @{ $hrCfg->{$caller_fn}->{skipped} // \() };
+            @skips = grep { !$skipped{$_} } @{ $hrCfg->{$caller_fn}->{actual_passed} };
+            #print STDERR "Skipping ", join(", ", @skips), "\n";
+        }
     }
 
     # Load Test::OnlySome with the appropriate skips
