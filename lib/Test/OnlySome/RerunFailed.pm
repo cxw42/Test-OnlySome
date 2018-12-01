@@ -78,9 +78,10 @@ sub import {
 
     if($hrCfg) {
         if($hrCfg->{$caller_fn}->{actual_passed}) {
-            my %skipped = map { $_ => 1 }
-                @{ $hrCfg->{$caller_fn}->{skipped} // \() };
-            @skips = grep { !$skipped{$_} } @{ $hrCfg->{$caller_fn}->{actual_passed} };
+            #my %skipped = map { $_ => 1 }
+            #    @{ $hrCfg->{$caller_fn}->{skipped} // \() };
+            #@skips = grep { !$skipped{$_} } @{ $hrCfg->{$caller_fn}->{actual_passed} };
+            @skips = @{ $hrCfg->{$caller_fn}->{actual_passed} };
             print STDERR "# Skipping ", join(", ", @skips), "\n"
                 if $opts{verbose}
         }
