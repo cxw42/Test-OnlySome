@@ -34,6 +34,7 @@ t/32-test-kit-from-nested.t
 t/41-load-rerun-failed.t
 t/42-rerun-failed.t
 t/43-plugin-output.t
+t/44-rerun-failed-multi-run.t
 t/allkinds.test
 t/allkinds.yml
 t/lib/DImportInto.pm
@@ -41,6 +42,7 @@ t/lib/DTest.pm			Helpers for testing
 t/lib/DTestKit.pm
 t/lib/Nested/DImportInto.pm
 t/lib/Nested/DTestKit.pm
+t/rerunfailed.test
 xt/boilerplate.t
 xt/changes.t
 xt/manifest.t

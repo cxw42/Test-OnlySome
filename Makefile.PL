@@ -112,8 +112,10 @@ WriteMakefile(
     TEST_REQUIRES => {
         'App::Prove' => '0',
         'constant' => '0',
+        'Exporter::Renaming' => '0',
         'Test::Fatal' => '0',
         'Test::Kit' => '2.14',
+        'Test2::Tools::Compare' => '0',
     },
     PREREQ_PM => {
         'Best' => '0.11',   # Because single-method imports work in 0.11+

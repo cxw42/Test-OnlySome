@@ -1,0 +1,9 @@
+Test-OnlySome design - allkinds.test,,,,,,,,
+,,,,,,,,
+Test num,Reality,passed,failed,actual_passed,actual_failed,skipped,todo,Should skip next time?
+1,pass,x,,x,,,,Y
+2,fail,,x,,x,,,N
+3,skip+fail,x,,x,,x,,Y
+4,skip+pass,x,,x,,x,,Y
+5,todo+fail,x,,,x,,x,N
+6,todo+pass,x,,,x,,x,N
