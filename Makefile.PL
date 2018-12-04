@@ -49,7 +49,7 @@ my $secure_perl_path = get_perl_filename();
 
         return <<EOT;
 authortest:
-\tRELEASE_TESTING=1 prove -lv xt
+\tRELEASE_TESTING=1 prove -lvj4 xt
 
 testhere:   # Run the tests from lib rather than blib
 \tprove -lj4

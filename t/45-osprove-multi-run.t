@@ -1,12 +1,12 @@
 #!perl
-# t/44-rerun-failed-multi-run.t: Test the App::Prove plugin.
-# Runs t/rerunfailed.test with prove -PTest::OnlySomeP multiple times.
+# t/45-osprove-multi-run.t: Test the osprove binary
+# Runs t/rerunfailed.test with osprove multiple times.
+# Assumes cwd is blib/.. or bin/.. .
 
-package t44;
+package t45;
 
 use rlib 'lib';
 use DTest;
-use App::Prove;
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
 use Exporter::Renaming;
@@ -38,21 +38,28 @@ sub run_prove {
     my $test_fn = shift;
     my $results_fn = shift;
 
-    diag "vvvvvvvvvvv Running tests in $test_fn under App::Prove";
-    my $app = App::Prove->new;
+    # Use the one in blib if it exists
+    my ($script, $lib);
+    if(-x 'blib/script/osprove') {
+        $script = 'blib/script/osprove';
+        $lib = 'blib/lib';
+    } else {
+        $script = 'bin/osprove';
+        $lib = 'lib';
+    }
 
-    $app->process_args(
-        qw(--norc --state=all),  # Isolate us from the environment
-        qw(-l),                     # DTest relies on Test::OnlySome::PathCapsule
-        qw(-v),                     # Show the skips
-        $test_fn,
-        '-PTest::OnlySomeP=filename,' . $results_fn
-    );
+    diag "vvvvvvvvvvv Running tests in $test_fn under $script";
 
     # prove(1) gets confused by the mixed output from this script and from
-    # the inner App::Prove.  Therefore, capture it.
+    # the inner osprove.  Therefore, capture it.
     my ($stdout, $stderr, @result) = capture {
-        $app->run;
+        system($script,
+            qw(--norc --state=all),  # Isolate us from the environment
+            qw(-v),                  # Show the skips
+            '-I', $lib,              # DTest relies on Test::OnlySome::PathCapsule
+            '--onlysome', $results_fn,
+            $test_fn
+        );
     };
 
     diag "  Result was ", join ", ", @result;
@@ -60,7 +67,7 @@ sub run_prove {
     diag $stdout;
     diag "  STDERR";
     diag $stderr;
-    diag "^^^^^^^^^^^ End of output from running tests in $test_fn under App::Prove";
+    diag "^^^^^^^^^^^ End of output from running tests in $test_fn under $script";
 } #run_prove()
 
 sub check_results {

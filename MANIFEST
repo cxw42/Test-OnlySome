@@ -37,6 +37,7 @@ t/41-load-rerun-failed.t
 t/42-rerun-failed.t
 t/43-plugin-output.t
 t/44-rerun-failed-multi-run.t
+t/45-osprove-multi-run.t
 t/allkinds.test
 t/allkinds.yml
 t/lib/DImportInto.pm
