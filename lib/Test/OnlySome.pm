@@ -19,7 +19,7 @@ our $VERSION = '0.000008';
 
 # TODO move $TEST_NUMBER_OS into the options structure.
 
-# Docs {{{3
+# Docs, including osprove and T::OS::RerunFailed example {{{3
 
 =head1 NAME
 
@@ -73,13 +73,17 @@ Then, re-run:
 
 Since test 1 passed the first time, it was skipped the second time.
 
-You don't have to use C<Test::OnlySome::RerunFailed>.  You can directly
+You don't have to use L<Test::OnlySome::RerunFailed>.  You can directly
 use C<Test::OnlySome>, and you can decide in some other way which tests
 you want to skip.
 
 The argument to L</os> can be a statement or block, and it doesn't have to
 be a L<Test::More> test.  You can wrap long-running tests in functions,
 and apply L</os> to those functions.
+
+Please note that L</os> can take a C<test_count> argument.  As discussed
+in more detail below, please use a C<test_count> of 1 for all tests run
+under L<Test::OnlySome::RerunFailed>.
 
 =head1 MARKING TESTS
 
@@ -279,8 +283,28 @@ C<< $hashref_options->{n} >>.
 
 =back
 
-CAUTION: The given statement or block will be run in its own lexical scope,
+=head3 Cautions
+
+=over
+
+=item *
+
+The given statement or block will be run in its own lexical scope,
 not in the caller's scope.
+
+=item *
+
+If you use C<< test_count>1 >>, the whole block will be skipped based on
+whether the B<first test> in that block should be skipped.  So, for example,
+
+    os 2 { ok(1); ok(0); }
+
+will skip the C<ok(0)> if the C<ok(1)> is skipped.
+
+=back
+
+I recommend that, when using L<Test::OnlySome::RerunFailed>, you B<not> use
+C<< test_count>1 >>.
 
 =cut
 
