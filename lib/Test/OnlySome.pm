@@ -2,20 +2,22 @@ package Test::OnlySome;
 use 5.012;
 use strict;
 use warnings;
-use Keyword::Declare;
 use Data::Dumper;   # DEBUG
+
 use Carp qw(croak);
+use Keyword::Declare;   # {debug=>1};
+use List::Util::MaybeXS qw(all);
 use Scalar::Util qw(looks_like_number);
 
 use vars;
 use Import::Into;
 
-use constant { true => !!1, false => !!0 };
-
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
-our $VERSION = '0.000008';
+our $VERSION = '0.001000';
+
+use constant { true => !!1, false => !!0 };
 
 # TODO move $TEST_NUMBER_OS into the options structure.
 
@@ -201,6 +203,14 @@ sub import {
     # going to use for our own purposes below.
     $self->export_to_level($level);
 
+    # Put List::Util::all() in the caller's package so we can use it in
+    # the generated code.  Otherwise, the caller would have to use
+    # List::Util manually.
+    {
+        no strict 'refs';
+        *{ $target . '::__TOS_all' } = \&all;
+    }
+
     # Create the variables we need in the target package
     vars->import::into($target, qw($TEST_NUMBER_OS $TEST_ONLYSOME));
 
@@ -378,19 +388,23 @@ sub _gen {
 
     $N = "$optsVarName$W$L n $R // 1" unless $N;
 
-    my $replacement = qq{
+    my $replacement = qq[
         {
-            my \$ntests = $N;
-            my \$first_test_num = \$TEST_NUMBER_OS;
-            \$TEST_NUMBER_OS += \$ntests;
+            my \$__ntests = $N;
+            my \$__first_test_num = \$TEST_NUMBER_OS;
+            \$TEST_NUMBER_OS += \$__ntests;
+            my \$__skips = $optsVarName$W$L skip $R;
+            my \@__x = (\$__first_test_num .. (\$__first_test_num+\$__ntests-1));
+            # print STDERR 'Tests: ', join(', ', \@__x), "\\n";
+
             SKIP: {
-                # print STDERR " ==> Trying test \$first_test_num\\n"; # DEBUG
-                skip 'Test::OnlySome: you asked me to skip this', \$ntests
-                    if $optsVarName$W$L skip $R$W$L \$first_test_num $R;
+                skip 'Test::OnlySome: you asked me to skip this', \$__ntests
+                    if __TOS_all { \$__skips$W$L \$_ $R } \@__x;
+
                 $code
             }
-        };
-    };
+        }
+    ];
 
     #print STDERR "$replacement\n"; # DEBUG
     return $replacement;
@@ -501,7 +515,6 @@ sub _printtrace {
 
 # }}}2
 # }}}1
-
 # More docs {{{3
 =head1 VARIABLES
 

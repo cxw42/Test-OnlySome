@@ -1,5 +1,7 @@
 #!perl
 
+# TODO see if I can replace this with Path::Class, Path::Extended,
+# or Badger::Filesystem::Path.
 package Test::OnlySome::PathCapsule;
 use 5.012;
 use strict;
@@ -10,7 +12,7 @@ use Cwd qw(cwd);
 
 use constant { true => !!1, false => !!0 };
 
-our $VERSION = '0.000008';
+our $VERSION = '0.001000';
 
 # Docs {{{2
 

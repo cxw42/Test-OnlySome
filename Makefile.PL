@@ -124,6 +124,7 @@ WriteMakefile(
         'File::Spec' => '0',
         'Getopt::Long' => '2.5',
         'Keyword::Declare'  => '0.001006',
+        'List::Util::MaybeXS' => '1.500002',
         'Scalar::Util' => '1.39',
         'vars' => '0',
     },
