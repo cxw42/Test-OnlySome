@@ -33,7 +33,21 @@ $dut = Test::OnlySome::PathCapsule->new('/foo/bar');
 is($dut->abs, '/foo/bar', 'Absolute path in subdir');
 
 # }}}1
-# TODO write tests below
+# clone {{{1
+{
+    my $curr = $dut->abs;
+    my($clone1, $clone2) = ($dut->clone(), $dut->clone());
+    cmp_ok($dut, '!=', $clone1, 'Object and clone 1 differ');
+    cmp_ok($dut, '!=', $clone2, 'Object and clone 2 differ');
+    cmp_ok($clone1, '!=', $clone2, 'Clones 1 and 2 differ');
+    is($clone1->abs, $curr, 'Object and clone 1 have the same path');
+    is($clone2->abs, $curr, 'Object and clone 2 have the same path');
+
+    $clone1->up();
+    is($dut->abs, $curr, "Modifying clone 1 doesn't touch original");
+    is($clone2->abs, $curr, "Modifying clone 1 doesn't touch clone 2");
+}
+# }}}1
 # up {{{1
 
 $dut = Test::OnlySome::PathCapsule->new('/foo/bar');
