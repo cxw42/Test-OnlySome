@@ -1,8 +1,10 @@
 use 5.012;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 use Config;
+use ExtUtils::MakeMaker;
+
+my $VERSION_FROM = 'lib/Test/OnlySome.pm';
 
 # Module metadata {{{1
 my $provides;
@@ -30,17 +32,52 @@ sub get_perl_filename {
 
 my $secure_perl_path = get_perl_filename();
 
-# Set up Makefile to generate README.md and uninstall targets {{{1
+# Makefile customization (MY) {{{1
 {   package MY;
+    use Module::Extract::VERSION;
 
-    # dist_core: make `dist` a :: target rather than a : target.
+    # dist_core: make `dist` a :: target rather than a : target,
+    # and add -TRIAL if necessary.
     sub dist_core {
         my $self = shift;
         my $text = $self->SUPER::dist_core(@_);
         $text =~ s/^dist\s*:[^:]/dist:: /m;
+
+        # Add -TRIAL if it's a trial release
+
+        # For some reason this triggered "failed to clean-up metadata" errors.
+        #my (undef, undef, $ver, $fn, $lineno) =
+        #    Module::Extract::VERSION->parse_version_safely($VERSION_FROM);
+
+        TRIAL: {
+            # Get the VERSION line
+            open my $fd, '<', $VERSION_FROM or last TRIAL;
+            my $linetext;
+            while(<$fd>) {
+                next unless /VERSION/;
+                $linetext = $_;
+                last;
+            }
+            close $fd;
+
+            if($linetext =~ m/TRIAL/) {
+                print STDERR "TRIAL version\n";
+                my $newtext .=  # Command to rename the tgz
+                    "\t$secure_perl_path -MExtUtils::Command -e mv -- " .
+                    "\"\$(DISTVNAME).tar\$(SUFFIX)\" " .
+                    "\"\$(DISTVNAME)-TRIAL.tar\$(SUFFIX)\"\n";
+
+                # Insert $newtext at the end of the `dist` target
+                $text =~ s{
+                    ^(dist.*?\n         # dist header line
+                        (?:\t.*?\n)+)   # dist body lines
+                }{$1$newtext}mx;
+            }
+        }
         return $text;
     } # MY::dist_core
 
+    # Generate README.md; add uninstall target and other test targets
     sub postamble {     # TODO also handle Windows nmake syntax (SET vs. export)
 
         # Note: pod2markdown is marked with a hyphen so that `make` can
@@ -86,11 +123,12 @@ EOT
     } #postamble()
 } #package MY }}}1
 
-WriteMakefile(
+# Main options for EUMM
+my %opts = (
     NAME             => 'Test::OnlySome',
     AUTHOR           => q{Christopher White <cxwembedded@gmail.com>},
-    VERSION_FROM     => 'lib/Test/OnlySome.pm',
-    ABSTRACT_FROM    => 'lib/Test/OnlySome.pm',
+    VERSION_FROM     => $VERSION_FROM,
+    ABSTRACT_FROM    => $VERSION_FROM,
     LICENSE          => 'mit',
     PL_FILES         => {},
     EXE_FILES       => [ 'bin/osprove' ],
@@ -163,8 +201,14 @@ WriteMakefile(
         $provides ? (provides => $provides) : (),
 
     }, #META_MERGE
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    dist  => {
+        DIST_DEFAULT => 'tardist',  # if you change this, change the
+                                    # customization of the dist target above
+        COMPRESS => 'gzip -9f', SUFFIX => 'gz',
+    },
     clean => { FILES => 'Test-OnlySome-*' },
-);
+); # %opts
+
+WriteMakefile(%opts);
 
 # vi: set fdm=marker fdl=0: #
