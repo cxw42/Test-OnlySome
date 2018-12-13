@@ -3,8 +3,9 @@ use strict;
 use warnings;
 use Config;
 use ExtUtils::MakeMaker;
+use File::Spec;
 
-my $VERSION_FROM = 'lib/Test/OnlySome.pm';
+my $VERSION_FROM = File::Spec->catfile(qw(lib Test OnlySome.pm));
 
 # Module metadata {{{1
 my $provides;
@@ -34,7 +35,6 @@ my $secure_perl_path = get_perl_filename();
 
 # Makefile customization (MY) {{{1
 {   package MY;
-    use Module::Extract::VERSION;
 
     # dist_core: make `dist` a :: target rather than a : target,
     # and add -TRIAL if necessary.
@@ -137,6 +137,7 @@ my %opts = (
     CONFIGURE_REQUIRES => {
         'Config' => '0',
         'ExtUtils::MakeMaker' => '0',
+        'File::Spec' => '0',
     },
     BUILD_REQUIRES => {
         'Carp' => '0',

@@ -11,7 +11,8 @@ install:
     # of the directory.*
   - set PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
   - cd %APPVEYOR_BUILD_FOLDER%
-  - cpanm --installdeps --notest .
+  - perl -v
+  - cpanm --installdeps --notest --verbose .
   #- cpanm --installdeps --with-develop --notest .
     # shouldn't need develop dependencies to pass the tests, since those
     # dependencies aren't required on users' machines.
