@@ -6,7 +6,25 @@ use ExtUtils::MakeMaker;
 use File::Spec;
 
 my $VERSION_FROM = File::Spec->catfile(qw(lib Test OnlySome.pm));
+my $IS_TRIAL = check_trial();
 
+# Check if this is a TRIAL version {{{1
+sub check_trial {
+    TRIAL: {
+        # Get the VERSION line
+        open my $fd, '<', $VERSION_FROM or last TRIAL;
+        my $linetext;
+        while(<$fd>) {
+            next unless /VERSION/;
+            $linetext = $_;
+            last;
+        }
+        close $fd;
+        return !!($linetext =~ /\bTRIAL\b/);
+    }
+    return 0;
+} #check_trial()
+# }}}1
 # Module metadata {{{1
 my $provides;
 eval {
@@ -49,30 +67,18 @@ my $secure_perl_path = get_perl_filename();
         #my (undef, undef, $ver, $fn, $lineno) =
         #    Module::Extract::VERSION->parse_version_safely($VERSION_FROM);
 
-        TRIAL: {
-            # Get the VERSION line
-            open my $fd, '<', $VERSION_FROM or last TRIAL;
-            my $linetext;
-            while(<$fd>) {
-                next unless /VERSION/;
-                $linetext = $_;
-                last;
-            }
-            close $fd;
+        if($IS_TRIAL) {
+            print STDERR "TRIAL version\n";
+            my $newtext .=  # Command to rename the tgz
+                "\t$secure_perl_path -MExtUtils::Command -e mv -- " .
+                "\"\$(DISTVNAME).tar\$(SUFFIX)\" " .
+                "\"\$(DISTVNAME)-TRIAL.tar\$(SUFFIX)\"\n";
 
-            if($linetext =~ m/TRIAL/) {
-                print STDERR "TRIAL version\n";
-                my $newtext .=  # Command to rename the tgz
-                    "\t$secure_perl_path -MExtUtils::Command -e mv -- " .
-                    "\"\$(DISTVNAME).tar\$(SUFFIX)\" " .
-                    "\"\$(DISTVNAME)-TRIAL.tar\$(SUFFIX)\"\n";
-
-                # Insert $newtext at the end of the `dist` target
-                $text =~ s{
-                    ^(dist.*?\n         # dist header line
-                        (?:\t.*?\n)+)   # dist body lines
-                }{$1$newtext}mx;
-            }
+            # Insert $newtext at the end of the `dist` target
+            $text =~ s{
+                ^(dist.*?\n         # dist header line
+                    (?:\t.*?\n)+)   # dist body lines
+            }{$1$newtext}mx;
         }
         return $text;
     } # MY::dist_core
@@ -209,6 +215,8 @@ my %opts = (
     },
     clean => { FILES => 'Test-OnlySome-*' },
 ); # %opts
+
+$opts{META_MERGE}->{release_status} = 'testing' if $IS_TRIAL;
 
 WriteMakefile(%opts);
 
