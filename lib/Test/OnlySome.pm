@@ -15,7 +15,7 @@ use Import::Into;
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001001'; # TRIAL
 
 use constant { true => !!1, false => !!0 };
 
