@@ -62,12 +62,9 @@ my $secure_perl_path = get_perl_filename();
         $text =~ s/^dist\s*:[^:]/dist:: /m;
 
         # Add -TRIAL if it's a trial release
-
-        # For some reason this triggered "failed to clean-up metadata" errors.
-        #my (undef, undef, $ver, $fn, $lineno) =
-        #    Module::Extract::VERSION->parse_version_safely($VERSION_FROM);
-
         if($IS_TRIAL) {
+            # Note: we don't have to worry about EOL; Appveyor uses gmake even
+            # on Windows, and it only uses \n.
             print STDERR "TRIAL version\n";
             my $newtext .=  # Command to rename the tgz
                 "\t$secure_perl_path -MExtUtils::Command -e mv -- " .
@@ -76,10 +73,15 @@ my $secure_perl_path = get_perl_filename();
 
             # Insert $newtext at the end of the `dist` target
             $text =~ s{
-                ^(dist.*?\n         # dist header line
-                    (?:\t.*?\n)+)   # dist body lines
+                ^(dist\h*:.*\n      # dist header line
+                    (?:\h+\S.*\n)+) # dist body lines.  `.` doesn't match `\n`.
+                                    # NOTE: on Appveyor, the continuation line
+                                    # begins with a space rather than a tab.
+                                    # Therefore, look for \h after \n.
+                                    # Not \s, because that matches a \n!
             }{$1$newtext}mx;
-        }
+        } #endif $IS_TRIAL
+
         return $text;
     } # MY::dist_core
 
