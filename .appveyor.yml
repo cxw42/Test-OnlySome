@@ -11,33 +11,16 @@ image:
 
 # === Basics ===
 
-install:
-
-  # Windows
-  - cmd: if not exist C:\strawberry\ choco install strawberryperl -y
-    # Need the trailing \ on c:\strawberry\ in order to test the existence
-    # of the directory.*
-  - cmd: set PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%
-
-  # Ubuntu.
-  # TODO is it possible to cache the apt-get packages?
-  #- sh: sudo apt-get update  # We don't seem to need this.
-  - sh: sudo apt-get --yes install cpanminus
-  - sh: cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-    # This one is from the cpanminus help message and sets up perl to
-    # install and use modules in ~/perl5.
-
-  # Common
-  - cpanm --installdeps --notest --verbose .
+# no install; it's platform-specific
 
 build_script:
+  - cpanm --installdeps --notest --verbose .
   - perl Makefile.PL
   - cmd: gmake
   - sh: make
 
 test_script:
-  #- echo Use just this line to succeed and save the cache.
+#  - echo Use just this line to succeed and save the cache.
   - cmd: gmake test
   - sh: make test
 
@@ -60,6 +43,13 @@ for:
       - C:\strawberry
         # This tree also includes the installed CPAN modules.
 
+    install:
+      - if not exist C:\strawberry\ choco install strawberryperl -y
+        # Need the trailing \ on c:\strawberry\ in order to test the existence
+        # of the directory.*
+      - set PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+      - cd %APPVEYOR_BUILD_FOLDER%
+
   # Platform-specific configuration for Ubuntu
   -
     matrix:
@@ -70,3 +60,16 @@ for:
       message: /\[ci-win\]/
     cache:
       - /home/appveyor/perl5
+
+    install:
+      # First, manually do what local::lib does: set up Perl to
+      # install and use modules in ~/perl5.
+      - export PERL_MB_OPT="$(printf -- '--install_base %s' ~/perl5)"
+      - export PERL_MM_OPT="$(printf 'INSTALL_BASE=%s' ~/perl5)"
+      - export PERL5LIB=~/perl5/lib/perl5
+      - export PATH=~/perl5/bin:$PATH
+      - export PERL_LOCAL_LIB_ROOT=~/perl5:$PERL_LOCAL_LIB_ROOT
+
+      # Then, install cpanminus locally so it will be cached.
+      - which cpanm || (curl -L https://cpanmin.us | perl - App::cpanminus)
+

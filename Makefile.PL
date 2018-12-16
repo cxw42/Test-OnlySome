@@ -163,6 +163,10 @@ my %opts = (
         'Exporter::Renaming' => '0',
         'rlib' => '0',
         'Test::Fatal' => '0',
+            # Test::Fatal requires Try::Tiny, but for some reason cpanm
+            # didn't seem to realize that on Appveyor Ubuntu.  List it here
+            # until sometime when I have a chance to investigate further.
+            'Try::Tiny' => '0.07',
         'Test::Kit' => '2.14',
         'Test2::Tools::Compare' => '0',
     },
