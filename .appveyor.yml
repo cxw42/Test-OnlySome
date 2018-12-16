@@ -1,30 +1,72 @@
 # Thanks to http://blogs.perl.org/users/mauke/2017/10/automated-testing-on-windows-with-appveyor.html
 # by mauke
 
-cache:
-  - C:\strawberry
-    # This tree also includes the installed CPAN modules.
+# === Build matrix ===
+
+# Win is default; Ubuntu is override.  See
+# https://www.appveyor.com/blog/2018/04/25/specialized-build-matrix-configuration-in-appveyor/
+image:
+  - Visual Studio 2013
+  - Ubuntu1604
+
+# === Basics ===
 
 install:
-  - if not exist C:\strawberry\ choco install strawberryperl -y
+
+  # Windows
+  - cmd: if not exist C:\strawberry\ choco install strawberryperl -y
     # Need the trailing \ on c:\strawberry\ in order to test the existence
     # of the directory.*
-  - set PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - perl -v
+  - cmd: set PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%
+
+  # Ubuntu.
+  # TODO is it possible to cache the apt-get packages?
+  #- sh: sudo apt-get update  # We don't seem to need this.
+  - sh: sudo apt-get --yes install cpanminus
+  - sh: cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+    # This one is from the cpanminus help message and sets up perl to
+    # install and use modules in ~/perl5.
+
+  # Common
   - cpanm --installdeps --notest --verbose .
-  #- cpanm --installdeps --with-develop --notest .
-    # shouldn't need develop dependencies to pass the tests, since those
-    # dependencies aren't required on users' machines.
 
 build_script:
   - perl Makefile.PL
-  - gmake
+  - cmd: gmake
+  - sh: make
 
 test_script:
   #- echo Use just this line to succeed and save the cache.
-  - gmake test
+  - cmd: gmake test
+  - sh: make test
 
 # * Thanks to https://stackoverflow.com/a/21041546/2877364
 #   by https://stackoverflow.com/users/2964427/09stephenb and
 #   https://stackoverflow.com/users/3814740/alexander-gelbukh for the tip.
+
+# === Platform-specific config ===
+
+for:
+
+  # Platform-specific configuration for Windows
+  -
+    matrix:
+      only:
+        - image: Visual Studio 2013
+    skip_commits:
+      message: /\[ci-linux\]/
+    cache:
+      - C:\strawberry
+        # This tree also includes the installed CPAN modules.
+
+  # Platform-specific configuration for Ubuntu
+  -
+    matrix:
+      only:
+        - image: Ubuntu1604
+    # Don't run Ubuntu if the commit message includes [ci-win]
+    skip_commits:
+      message: /\[ci-win\]/
+    cache:
+      - /home/appveyor/perl5

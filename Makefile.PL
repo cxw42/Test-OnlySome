@@ -161,6 +161,7 @@ my %opts = (
         'Capture::Tiny' => '0',
         'constant' => '0',
         'Exporter::Renaming' => '0',
+        'rlib' => '0',
         'Test::Fatal' => '0',
         'Test::Kit' => '2.14',
         'Test2::Tools::Compare' => '0',
