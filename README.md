@@ -183,6 +183,10 @@ You can also look for information at:
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome)
 
+This module is versioned with [semantic versioning](https://semver.org),
+but in the backward-compatible Perl format.  So version `0.001003` is
+semantic version `0.1.3`.
+
 # LICENSE AND COPYRIGHT
 
 Copyright 2018 Christopher White.

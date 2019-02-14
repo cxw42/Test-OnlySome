@@ -15,7 +15,7 @@ use Import::Into;
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
-our $VERSION = '0.001002'; # TRIAL
+our $VERSION = '0.001003';
 
 use constant { true => !!1, false => !!0 };
 
@@ -595,6 +595,10 @@ L<https://metacpan.org/release/Test-OnlySome>
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 
 =back
+
+This module is versioned with L<semantic versioning|https://semver.org>,
+but in the backward-compatible Perl format.  So version C<0.001003> is
+semantic version C<0.1.3>.
 
 =cut
 

@@ -10,7 +10,7 @@ use Best [ [qw(YAML::XS YAML)], qw(DumpFile) ];
 
 #use Data::Dumper;
 
-our $VERSION = '0.001002'; # TRIAL
+our $VERSION = '0.001003';
 
 # Docs {{{2
 
