@@ -64,3 +64,4 @@ DEBUG*
 
 # App::FatPacker
 *.trace
+/local/
