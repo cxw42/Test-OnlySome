@@ -67,3 +67,6 @@ DEBUG*
 
 # App::cpm
 /local/
+
+# Saved dist tarballs
+/zip/

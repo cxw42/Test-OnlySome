@@ -1,4 +1,9 @@
+# App::cpm
 ^local\/
+
+# Saved dist tarballs
+^zip\/
+
 ^\.editorconfig
 ^\.[^\\\/]*\.yml
 \.swp$
