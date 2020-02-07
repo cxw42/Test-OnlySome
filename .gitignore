@@ -64,4 +64,6 @@ DEBUG*
 
 # App::FatPacker
 *.trace
+
+# App::cpm
 /local/
