@@ -331,7 +331,7 @@ C<< test_count == 1 >>.
         #my $target = caller(2);     # Skip past Keyword::Declare's code.
         #                            # TODO make this more robust.
 
-        if(_have($debug_var)) {
+        if(length($debug_var)) {
             no strict 'refs';
             $debug_var =~ s/^['"]|['"]$//g;   # $debug_var comes with quotes
             ${$debug_var} = {opts_var_name => $opts_name, code => $controlled,
@@ -341,7 +341,7 @@ C<< test_count == 1 >>.
         }
 
         # Get the options
-        my $hrOptsName = _have($opts_name) ? $opts_name : '$TEST_ONLYSOME';
+        my $hrOptsName = length($opts_name) ? $opts_name : '$TEST_ONLYSOME';
 
 #        print STDERR "os: Options in $hrOptsName\n";
 #        _printtrace();
@@ -349,7 +349,7 @@ C<< test_count == 1 >>.
         croak "Need options as a scalar variable - got $hrOptsName"
             unless defined $hrOptsName && substr($hrOptsName, 0, 1) eq '$';
 
-        return _gen($hrOptsName, $controlled, _have($N) ? $N : undef);
+        return _gen($hrOptsName, $controlled, length($N) ? $N : undef);
     } # os() }}}2
 
 } # import()
@@ -516,27 +516,6 @@ sub _printtrace {
         last unless $callers[-1]->[0];
     }
     print Dumper(\@callers), "\n";
-}
-
-=head2 _have
-
-Check whether an optional variable is present.  This changed from
-Keyword::Declare v0.001014 to v0.001015.  Usage: C<_have($maybe_arg)>.
-
-=cut
-
-sub _have {
-    return false unless @_;
-    my $arg = $_[0];    # not shift - trying to avoid *ification
-    return false unless defined $arg;   # K::D <= v0.001014
-
-    if(ref $arg eq 'Keyword::Declare::Arg' && reftype $arg eq 'HASH') {
-        # K::D >= v0.001015
-        my $str = "$arg";   # K::D::Arg stringifies to actual text.
-        return $str ne '';  # Can't just test truthiness - '0' might be
-                            # a valid syntactic entity.
-    }
-    return true;    # If we got here, it's K::D <= v0.001014 && defined $arg
 }
 
 # }}}2
